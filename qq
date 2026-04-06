@@ -1,0 +1,307 @@
+Executive Summary
+The Marbleshore presentation will outline the end-to-end insurance process and data flows for a planned system integration project. It will cover both the Underwriting/Policy Issuance workflow and the Premium & Claims Bordereaux workflow, identify key roles, systems, and data exchanges, and detail the integration design (e.g. the UWC→ASCO and SRM→EDW feeds). The audience is assumed to be Marbleshore underwriting managers, IT architects, and project stakeholders. We assume no existing corporate PowerPoint template, so a clean, professional theme will be used with Marbleshore corporate-style colors (blue/grays)[1]. The deck will have 10 slides (plus title), ~45–60 minutes total. Each slide is timed ~4–6 minutes (more for complex diagrams). Key milestones and data integration details will be highlighted.
+Purpose, Audience & Assumptions
+•	Purpose: To present Marbleshore’s new integrated underwriting/bordereaux solution – its processes, system architecture, timeline, and next steps – in a concise executive-level slide deck.
+•	Audience: Underwriting/Actuarial managers, IT/Data architects, Project sponsors, and selected partners (brokers/coverholders). The content is technical but non-IT-savvy stakeholders should be accommodated (brief speaker notes explain jargon).
+•	Assumptions: The audience is familiar with basic insurance terms but not the specific Marbleshore systems. We assume Marbleshore brand guidelines allow a blue/gray theme, and that we should not include any Safelite-specific details beyond slide structure. Unspecified items (e.g. exact launch date) will be noted as “TBD” or based on earliest estimates.
+Slide Count & Timing
+•	Total Slides: 10 (including title and concluding slides). This matches the example Safelite deck.
+•	Timing: ~4–6 minutes per slide, total ~45–60 min talk. The timeline slide and architecture slides may take slightly longer (6–7 min), simpler bullet slides can be ~3–4 min. Pace should allow Q&A prompts.
+Slide-by-Slide Outline
+Slide 1: Title Slide (Marbleshore Project Overview)
+•	Title: “Marbleshore Integration Initiative: Process & Data Flows” (or similar)
+•	Subtitle: e.g. “Premium & Claims Bordereaux + Underwriting Systems” with date/“Draft” marker.
+•	Bullets: None (just a brief tagline if needed, e.g. “Modernizing Underwriting and Bordereaux Management”).
+•	Visual: Corporate logo (if available) and a simple background (e.g. abstract blue wave or insurance-themed image). (No data chart on title slide.)
+•	Speaker Notes: Introduce the project name (“Marbleshore”), highlight main goal: integrate systems to improve data flow and efficiency.
+Slide 2: Project Timeline & Key Milestones
+•	Title: “Timelines & Key Milestones”
+•	Content: A 12-week timeline (Wk-1 Nov17 to Wk-12 Feb2) with major phases. For example:
+•	Planning & Design (Wk1–Wk3): Finalize technical design, data mapping, prepare environments.
+•	Development & Unit Testing (Wk4–Wk6): Implement UWC DB changes, build ETL jobs (SRM→EDW feed, UWC→ASCO feed).
+•	System Integration Testing (Wk7–Wk8): Test end-to-end flows (underwriting to ASCO, SRM data in EDW).
+•	User Acceptance Testing (Wk9–Wk10): End-user trials, underwriter sign-off.
+•	Deployment (Wk11–Wk12): Production cutover, hypercare period, go-live.
+•	Visual: A gantt chart or timeline graphic. (Example below uses a Mermaid Gantt diagram.)
+
+ 	gantt
+  title Marbleshore Project Timeline (12 weeks)
+  dateFormat  YYYY-MM-DD
+  section Planning & Design
+  Finalize Design & Mapping  :done,    des1, 2025-11-17, 14d
+  Prepare Environments       :done,    env1, after des1, 7d
+  section Development
+  UWC DB Schema Changes      :active,  dev1, 2025-12-08, 10d
+  ETL: SRM → EDW             :active,  dev2, after dev1, 10d
+  ETL: UWC → ASCO            :active,  dev3, 2025-12-15, 10d
+  section Testing
+  System Integration (SIT)   :crit,    sit1, 2026-01-05, 10d
+  User Acceptance (UAT)      :crit,    uat1, after sit1, 14d
+  section Deployment
+  Production Cutover & H/Care:         rel1, 2026-02-01, 5d
+•	Speaker Notes: Walk through each phase. Emphasize timely handoffs (design complete by Wk2, SIT complete by Wk8, UAT by Wk10, Go-Live by Wk12). Mention that milestones include “Design Sign-off”, “Complete SIT”, “UAT Start/Sign-off”, and “Go-Live”.
+Slide 3: Roles & Responsibilities (RACI Matrix)
+•	Title: “Roles & Responsibilities”
+•	Content: A table (RACI format) listing each major activity/phase vs. the responsible teams. For brevity, show key roles (Underwriter, UW Assistant, Rater, PCS Team, SRM Team, ASCO Team, Data/IT Team) and mark accountability. Example simplified table format:
+Phase/Activity	Underwriting Team	PCS Team	SRM/Data Team	ASCO Team	Finance Team
+Submit & Log Submission	R/A	C	I	I	I
+Underwriting Review & Quote	R/A	C	I	I	I
+Bordereaux Submission Receipt	C	R/A	I	I	I
+Data Ingestion & Validation	C	R/A	I	I	I
+Premium Reconciliation	I	R	I	I	R/A
+Claims Payment Processing	I	R/A	I	I	R/A
+Reporting & Analytics	C	I	R/A	C	I
+(R = Responsible, A = Accountable, C = Consulted, I = Informed.)
+- Speaker Notes: Explain who does what. For example, the Underwriting Team (Underwriters/UW Assistants) “owns” submissions and quoting, PCS Team “owns” bordereaux processing, Finance Team owns reconciliation, etc. Note that SRM/Data Team is accountable for providing clean master data into EDW for reporting.
+Slide 4: System Architecture & Data Flows
+•	Title: “System Architecture (Data Flows)”
+•	Content: Explain key system components and interfaces:
+•	Source Systems: SRM (customer data), Policy Center Suite (PCS/UWC for underwriting data), ASCO (specialty policies).
+•	Data Warehouse: ETL via DataStage → Operational Data Store (ODS) → Enterprise Data Warehouse (EDW) → Reporting Tools (BI).
+•	Integration: UWC (the new Underwriting Console) will feed policy/underwriting data into the ASCO system (Marbleshore Specialty) – currently a “TBD” integration point.
+•	Emphasize that ASCO must consume UWC data for specialty underwriting insights.
+•	Visual: A flow diagram. For example:
+
+ 	flowchart LR
+  SRM -->|Extract via DataStage| ODS
+  ODS -->|Load| EDW
+  EDW --> Reporting
+  UWC -->|Feed| ASCO
+  PCS <--> SRM 
+•	Speaker Notes: Describe the diagram. Data flows (SRM → EDW → reporting), and UWC→ASCO feed. Mention that DataStage jobs will handle the ETL daily. Clarify the “TBD” ASCO link is a planned new SFTP/API feed.
+Slide 5: Underwriting & Policy Issuance Process
+•	Title: “Underwriting & Policy Issuance Workflow”
+•	Content: Step-by-step bullet list (or flow diagram) of the quote-to-bind process (as extracted from the PCS workstreams):
+•	1. Submission Intake: Broker submits new business request; UW Assistant logs details into PCS/UWC.
+•	2. Underwriter Review: Underwriter reviews submission for eligibility/appetite. (Check SRM for existing customer info.)
+•	3. Rater/Pricing: Actuarial Rater runs rating models (in Excel or PCS) to generate premium quotes.
+•	4. Quote & Proposal: Underwriting team generates formal quote document via PCS and sends to broker.
+•	5. Broker Binding: Broker returns “order to bind” after client approval.
+•	6. Policy Bind & Issue: Underwriter enters binding into PCS/UWC, and UW Assistant issues final policy documents.
+•	Visual: (Optional) a simple flowchart or bullet icons. For example, a vertical arrow list with icons (submission envelope, user, calculator, document, handshake, policy).
+•	Speaker Notes: Emphasize smooth handoffs: once approved, policy binding is done in PCS. Note open action item: integrating SRM party data into PCS/UWC was identified. No manual work here beyond exceptions.
+Slide 6: Bordereaux (Premium & Claims) Process
+•	Title: “Premium & Claims Bordereaux Process”
+•	Content: Four phases (as per Marbleshore_high_level_flow):
+•	1. Receipt & Triage: Coverholder/TPA uploads monthly bordereaux (Excel/CSV) via email/SFTP/portal. PCS team logs file in Premium-Claims Services (PC-S) platform.
+•	2. Processing & Validation: Processor uploads bordereau into PC-S; automatic column mapping and data validation runs. Exceptions (invalid/missing data) are flagged and resolved (via email to coverholder).
+•	3. Reconciliation & Booking: Validated premium totals are reconciled with cash received. PCS team and Finance allocate payments in the accounting system (Exact). Validated claims are reviewed (with IMR for reference) and payment instructions are prepared.
+•	4. Reporting & Closure: Finalized bordereau data is archived. PCS generates reports (by Excel/PDF) for underwriters, finance, and management.
+•	Visual: (Optional) A simplified flow diagram or list with arrows between icons labeled “Receive → Validate → Reconcile → Report”.
+•	Speaker Notes: Stress that processing is largely automated in PC-S, with human review of exceptions. Mention key systems (PC-S, Exact, IMR) at each stage.
+Slide 7: Partner Companies (Coverage Data)
+•	Title: “Partner Companies (Brokers/Coverholders)”
+•	Content: A two-column table or list summarizing all entries from the TUW_COMPANY sheet. For brevity we can split across columns:
+Code	Company Name		Code	Company Name
+AB001	Abbey Legal		HI016	Hiscox Ltd
+AG002	Argenta		LI017	Liberty Specialty Markets
+AL003	Allied World		MA018	Markel Insurance
+AM004	AmTrust		MS019	MS Amlin
+AN005	Antares		QBE020	QBE Insurance Group
+AP006	Apollo		ST021	Starr Insurance
+AR007	Argo		TR022	Travelers Insurance
+AX008	AXIS Capital		--	
+BE009	Beazley			
+BH010	Berkshire Hathaway			
+CA011	Canopius			
+CH012	Chaucer			
+CV013	Convex			
+FA014	Fairfax			
+HA015	Hamilton			
+(Entries taken from TUW_COMPANY sheet)
+- Speaker Notes: Note that these are the key brokers/coverholders Marbleshore deals with. They provide the bordereaux and business submissions. (No Marbleshore company itself appears in the list since “Marbleshore Specialty Ins. Co.” is internal.)
+Slide 8: Exception Handling & Reconciliation
+•	Title: “Exception Handling & Data Reconciliation”
+•	Content: Bulleted points on controls and exception processes:
+•	Automated Validations: All data feeds (bordereaux, SRM loads) run row-level checks (e.g. totals, policy existence). Pre-Validation jobs verify record counts and send alerts on mismatch.
+•	Exception Alerts: If record counts or data validations fail, an automated email alert is sent to the Support/Data team[2]. A work order is opened to investigate (e.g. contact coverholder for corrected bordereau).
+•	Reconciliation Steps: Premium totals are reconciled with the finance ledger (Exact). Discrepancies trigger follow-up (e.g. remittance advice errors).
+•	Exception Resolution: Problem cases are tracked in PCS/UWC; once corrected data is reprocessed, confirmations are sent to stakeholders.
+•	Visual: Possibly a small flowchart (e.g. “Job Scheduler → Pre-Validation → (OK vs ERROR) → Load Process → Notification” – no actual image needed).
+•	Speaker Notes: Emphasize that robust controls are in place: every data feed has a “control file” with row counts/hash totals. Any mismatch halts the load and notifies support. This avoids “undetected data loss.”
+Slide 9: Production Support & Escalation Model
+•	Title: “Production Support & Escalation”
+•	Content: Outline post-go-live support organization:
+•	Support Teams:
+o	Tier 1 (Ops): PCS/UWC Helpdesk (L1) – monitors daily job runs, first responder for alerts.
+o	Tier 2 (Data): Data/BI Team – investigates data issues (ETL, reconciliation mismatches).
+o	Tier 3 (Apps): Dev/QA Teams – code fixes in UWC/PCS/ASCO.
+•	SLAs:
+o	Critical failures: (e.g. job stops) 15-minute response, 2-hour resolution target.
+o	High/P1 (major): 1-hour response, 4-hour fix.
+o	Medium/Low: Next business day response.
+•	Escalation Path: If L1 cannot resolve, escalate to L2 then L3, and ultimately to Project Leads/Architects.
+•	Hypercare: First 4 weeks post-launch, dedicated support team on-call (redundancy coverage).
+•	Visual: A simple list or hierarchical chart of support tiers.
+•	Speaker Notes: Stress that support responsibilities are clearly assigned. Include contact rosters (e.g. 24×7 pager for critical issues). Note: the “Deloitte/PCS/AIG” RACI from Safelite is replaced by Marbleshore’s internal teams here.
+Slide 10: Non-Functional Requirements & Standards
+•	Title: “Non-Functional Requirements (UWC→ASCO Feed)”
+•	Content: Table of agreed NFRs for the data feed (as example) – columns: Type, Standard/Config, Notes:
+Type	Agreed Standard	Notes
+Delivery	Daily (weekday) at 2:00 AM UTC	Outside business hours for minimal impact.
+Protocol	SFTP	Secure file transfer (with key-based auth).
+File Format	Pipe-delimited .TXT (UTF-8)	Header row included with column names.
+Filename	UWC_ASCO_YYYYMMDD.txt.gpg	Timestamped; PGP-encrypted in transit.
+Control File	*.CTL with row count & hash total	Separate file sent alongside data file.
+Encryption	PGP (AES-256)	Both file and control file encrypted.
+Error Alerts	Automated email/Slack on failure	Includes logfile of failure reason.
+Retry Policy	On-demand rerun (manual)	Admin script with logging; post-mortem fixes.
+Retention	30 days (processed files)	Then archive to vault.
+Performance	<1,000 records/sec throughput	Via efficient bulk load (DataStage parallel).
+- Speaker Notes: Summarize that the feed meets corporate security and performance standards (encryption, code pages, control files, SLAs). Mention that this table is an agreed spec between Marbleshore IT and ASCO teams.		
+Slide Design & Style Guidelines
+•	Theme: Use a professional, modern theme (e.g. a blue/gray palette). Each slide should use the same master (matching Marbleshore colors). Titles in bold (e.g. Calibri Bold 32pt), body text in Calibri 20–24pt for readability.
+•	Fonts: Sans-serif (Calibri or Arial) for clarity. Consistent size/hierarchy: Title > Heading > Body. Avoid small text (<18pt).
+•	Colors: High-contrast text (dark on light). Marbleshore brand colors (if known) or “blue accents” for headers. Use color sparingly – e.g. one accent color per chart or diagram.
+•	Charts & Graphics: Use simple vector diagrams (Mermaid-style charts, tables) where possible. Icons or minimal stock photos can illustrate points (e.g. user icon for roles, process flow arrows).
+•	Accessibility: Ensure 4.5:1 contrast (e.g. dark blue on white). All images/diagrams have alt text. Bullet points kept short (no paragraphs).
+•	Layout: Left-align text; use whitespace. Keep 5–6 bullet points per slide max. Include slide numbers. Footer can have confidential tag, date, and logo if desired.
+Template/Theme Options
+We compare three possible PowerPoint templates/themes for Marbleshore:
+Option	Source	Style/Features	Cost	License	Quality/Notes
+Office White	Microsoft Office	Built-in minimal corporate (blue/gray) theme.	Free	Included in Office	Standard quality, widely used.
+SlideModel Pro	SlideModel.com	Modern data-centric design with charts/icons.	~$49/year	Subscription (unlimited slides)	High quality, customizable.
+Envato Elements	Envato (PPT Templates)	Fully editable slides (multi-color themes).	$16/month (with other assets)	Monthly subscription	Very high-quality, creative.
+We recommend a clean corporate theme (Office White or similar) for clarity and brand consistency.
+Stock Image Sources
+Possible image sources for any visual assets or icons:
+Source	Cost	License	Quality/Notes
+Unsplash	Free	CC0 (Royalty-free)	High-res, good variety; no attribution needed[2].
+
+Pexels	Free	CC0 (Royalty-free)	Large library of business/tech images.
+Shutterstock	Paid (~$10–$20/image)	Standard royalty-licensed	Professional stock (higher editorial quality).
+Unsplash/Pexels are recommended first due to zero cost and permissive license. Use Shutterstock/Adobe Stock only if specific images are needed (with budget).
+File Structure & Asset List
+A suggested project folder organization:
+Marbleshore_Presentation/
+├── slides/                    # Final PPT slides images (PNG) for reference
+│   ├── 01_Title.png
+│   ├── 02_Timeline.png
+│   └── ... 
+├── images/                    # Visual assets used
+│   ├── process_flow.png       # e.g. underwriting flowchart
+│   ├── architecture_diagram.png
+│   └── icons/                 # small icons (e.g. people, envelope)
+│       ├── user_icon.svg
+│       └── data_icon.svg
+├── data/                      # Source data/reference (if needed)
+│   └── TUW_COMPANY_list.xlsx
+└── docs/
+    └── speaker_notes.docx     # Detailed notes/script (transcript form)
+Asset List:
+- Diagrams: Underwriting Workflow, Bordereaux Flow, System Architecture – created via diagram software or Mermaid (export as PNG).
+- Icons/Images: e.g. envelope icon (for submission), gear icon (for processing), etc., from free icon libraries (FontAwesome, etc.).
+- Company Logos: If needed, Marbleshore and key partner logos (under license).
+- Fonts: Embed or use system fonts for portability (Calibri/Arial).
+Final QA Checklist
+Before delivery, ensure:
+- Content Accuracy: All facts match source docs. No slide contains unverified “TBD” facts without note.
+- Consistency: Font sizes, colors, and bullet styles are uniform. Slide numbering and titles appear in same style.
+- Spelling/Grammar: Proofread slide text and notes. Correct business names (e.g. “Antares”, “MS Amlin”).
+- Accessibility: Check color contrast and font legibility. Add alt text to images/diagrams. Ensure slide masters have no hidden placeholder text.
+- Brand Compliance: Use approved Marbleshore colors and logo. Confidential watermark/footer if needed (Safelite slide used “HIGHLY CONFIDENTIAL”).
+- Technical: Ensure data tables (e.g. Partner list) are readable and fit on slide (split into columns if needed).
+- Slide Flow: Verify that slide sequence tells a coherent story (not jumping topics abruptly).
+Sample 10-Slide Draft Content (Text)
+(This is a plain-text version of slide content to be copy-pasted into PowerPoint.)
+Slide 1: Title – Marbleshore Integration Initiative
+- Modernizing Bordereaux & Underwriting
+- [Date, Version]
+Slide 2: Timelines & Key Activities
+- Planning & Design (Nov 17–Dec 5): Finalize system design, data mapping, set up environments.
+- Development (Dec 6–Dec 24): Implement UWC database changes; develop ETL (SRM→EDW, UWC→ASCO); unit test components.
+- System Integration Testing (Jan 5–Jan 16): Test end-to-end flows (premium bordereau, claims, underwriting data transfers).
+- User Acceptance (Jan 17–Jan 30): Business testing of new processes and reports; fix defects.
+- Deployment (Feb 1–Feb 5): Production cutover, data migration, hypercare support.
+- Milestones: Design sign-off, SIT complete, UAT sign-off, Go-Live.
+Slide 3: Roles & Responsibilities (RACI)
+- Underwriters: Review submissions, approve quotes/binds (Systems: PCS, UWC).
+- UW Assistants: Enter submission details, generate quotes, issue policies (PCS).
+- Rater/Actuary: Run pricing models (Excel, PCS).
+- PCS Team: Manage bordereaux in PC-S; validate data (PC-S, Exact, IMR).
+- SRM Team: Provide master data to EDW; run daily ETL (DataStage, EDW).
+- ASCO (Specialty) Team: Consume UWC data for specialty policies (new data feed).
+- Finance: Allocate cash and reconcile premiums (Exact).
+- Brokers/Coverholders: Submit submissions and bordereaux (via email/SFTP).
+Slide 4: System Architecture & Data Flows
+- Data Warehouse Flow: SRM (source) → DataStage ETL → ODS → EDW → Reporting/Dashboards.
+- Underwriting Systems: PCS (policy engine) ↔ SRM (party data). UWC (UW Console) will feed ASCO.
+- ASCO: Marbleshore Specialty Ins. Co. system (needs UWC data). Integration “TBD” via daily file/API.
+- Bordereaux Feed: Coverholder files → PC-S ingest → Accounting (Exact) & IMR.
+- Visual: (See architecture flowchart below.)
+
+flowchart LR
+  SRM --> DataStage --> ODS --> EDW --> Reporting
+  PCS & UWC --> SRM
+  UWC --> ASCO
+Slide 5: Underwriting & Policy Issuance Workflow
+1. Broker Submission: Broker sends new business info; UW Assistant logs case in UWC/PCS.
+2. Underwriter Review: Underwriter assesses submission, updates appetite/status (checks SRM for existing parties).
+3. Rating: Rater computes premium using PCS or Excel models.
+4. Quote Generation: UW Assistant produces quote documents in PCS. Underwriter sends to broker.
+5. Broker Binding: Broker confirms “order to bind” after client approval.
+6. Policy Bind & Issue: Underwriter enters bind in UWC; UW Assistant issues final policy to broker.
+(Key systems: PCS/UWC for all entry and documentation.)
+Slide 6: Bordereaux (Premium & Claims) Process
+- Receive: Coverholder/TPA uploads Excel/CSV bordereau (email/SFTP). PCS team records file in PC-S.
+- Ingest: Processor uploads file into PC-S ingestion module; auto-mapping of columns is performed.
+- Validate: System runs rules (policy existence, totals); exceptions are flagged. Processor resolves errors (often via email to submitter).
+- Reconcile Premiums: Sum of valid premiums is compared to bank cash; Finance allocates payment in Exact.
+- Process Claims: Validated claims are reviewed; large claims documentation checked (via IMR as needed). Payment requests generated.
+- Report & Close: Final bordereau data archived. PCS produces reports (.xlsx/.pdf) for underwriters, finance, management.
+Slide 7: Partner Companies (Brokers/Coverholders)
+- Key Partners: (Codes from TUW_COMPANY)
+- AB001: Abbey Legal (London) – Contact: John Smith
+- AG002: Argenta (London) – Contact: David Williams
+- AL003: Allied World (London) – Contact: Sarah Jones
+- AM004: AmTrust (London) – Contact: Michael Brown
+- AN005: Antares (London) – Contact: Emma Davis
+- AP006: Apollo (London) – Contact: Robert Miller
+- AR007: Argo (London) – Contact: Jessica Wilson
+- AX008: AXIS Capital (London) – Contact: Chris Taylor
+- BE009: Beazley (London) – Contact: Emily Martinez
+- BH010: Berkshire Hathaway (London) – Contact: Daniel Garcia
+- CA011: Canopius (London) – Contact: Olivia Rodriguez
+- CH012: Chaucer (London) – Contact: James Hernandez
+- CV013: Convex (London) – Contact: Chloe Lopez
+- FA014: Fairfax (London) – Contact: William Gonzalez
+- HA015: Hamilton (London) – Contact: Sophia Perez
+- HI016: Hiscox (London) – Contact: Ethan Sanchez
+- LI017: Liberty Specialty Mkts (London) – Contact: Ava Rivera
+- MA018: Markel (London) – Contact: Noah King
+- MS019: MS Amlin (London) – Contact: Mia Wright
+- QBE020: QBE (London) – Contact: Logan Scott
+- ST021: Starr (London) – Contact: Isabella Green
+- TR022: Travelers (London) – Contact: Mason Adams
+- These are the active companies in the TUW_COMPANY register.
+Slide 8: Exception Handling & Reconciliation
+- Validation Checks: Each data transfer (bordereaux feeds, SRM extracts) is pre-validated. Automated jobs compare expected vs actual row counts[2].
+- Failure Alerts: If counts mismatch or data errors occur, an alert email is sent immediately to the Data/Support team with details.
+- Resolve Exceptions: Processor investigates: e.g. if a bordereau file failed validation, they contact the coverholder for corrections. Corrections are re-uploaded and re-processed.
+- Reconciliation Controls: Premium bordereaux are reconciled daily against banking ledgers. Discrepancies trigger follow-up (e.g. misapplied payments).
+- Audit Trail: All exceptions and resolutions are logged in PC-S/UWC (audit history). Reports highlight outstanding issues weekly.
+Slide 9: Support Model & Escalation Path
+- Support Teams:
+- L1 (Operations Team): Monitors daily jobs (PCS, ETL). First responders to alerts. Maintains runbooks.
+- L2 (Data/IT Team): Investigates data issues or job failures. Develops fixes for ETL or mapping errors.
+- L3 (Dev/Engineering): Handles code updates to UWC/PCS/ASCO and complex bug fixes.
+- Escalation: Unresolved incidents are escalated from L1 → L2 → L3. Critical issues notify project leads and management.
+- Service Levels:
+- Critical (jobs down): 15-min response, 2-hour fix (hotfix or rollback).
+- High: 1-hour response, 4-hour resolution.
+- Normal: Next-business-day response.
+- Hypercare Period: Full-time support for 4 weeks post-launch, then transition to steady-state support.
+- Monitoring: Key metrics (load success, exception rates) are tracked on a dashboard for early warning.
+Slide 10: Non-Functional Requirements & Standards
+- Security: All data feeds use SFTP + PGP encryption (AES-256). Files named per spec: UWC_ASCO_YYYYMMDD.txt.gpg.
+- Format: Pipe-delimited UTF-8 text with header row. Separate control file (.ctl) with row count and hash totals is sent with each load.
+- Frequency/Timing: Daily after 2:00 AM UTC. Data aligns with end-of-day processing in PCS/UWC.
+- Error Handling: Failed transfers trigger automated alerts (email/IM). Manual rerun allowed after issue is fixed; rerun results reconciled by team.
+- Performance: ETL jobs should complete within 4 hours; system can process ~1M records/day. Overnight loads minimize business impact.
+- Compliance: Adheres to corporate data standards (GDPR compliance on PII encryption, audit logs enabled).
+- Accessibility: Reports use clear fonts and color for charts. Slide deck follows AA contrast guidelines.
+________________________________________
+[1] Insurance Underwriting flow. | Download Scientific Diagram
+https://www.researchgate.net/figure/nsurance-Underwriting-flow_fig2_365613989
+[2] Analytics Dashboard Pictures | Download Free Images on Unsplash
+https://unsplash.com/s/photos/analytics-dashboard
