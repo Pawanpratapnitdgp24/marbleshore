@@ -1,0 +1,11 @@
+👉 Flow:
+
+Data comes from Duck Creek (WINS/CIP) into Tactical GDW as daily transactions
+Data is converted into inbound files and sent to the SRM Application
+SRM App processes and stores data in SRM DB
+From SRM, outbound files are generated
+These files are sent to downstream systems like GDW, FPSL, and FSCD
+
+👉 One-time activity:
+
+Historical data from RI Pro is migrated and stored in AIG Archival
