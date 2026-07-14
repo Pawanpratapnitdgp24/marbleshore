@@ -1,0 +1,486 @@
+first of all tell me how GRX - group excess data is flowing? explain me everything
+
+Toggles message in favorites.
+GRX / Group Excess data flow
+GRX is handled as a Manual / Program Connect Group Excess product in the visible package logic. The important nuance is that the source policy type is GRX, but the downstream Fiserv/AIG product code appears to flow through tpolicy_type.pol_type_wins_cd; for Group Excess that downstream product is shown as GEX, and GEX maps to line of business 171 in the loss/feed mappings .
+
+1. Where GRX enters the monthly run
+The main monthly orchestrator prc_policy_data_load calls the manual premium feed, manual claims feed, manual premium control, and manual claims control before the CIP/DC routines. The sequence is:
+
+prc_premium_feed_load
+prc_claims_feed_load
+prc_premium_control_load
+prc_claims_control_load
+then CIP/DC premium and claims control/feed routines
+So for GRX, the first place to look is the manual premium path, not the DC/Instanda path.
+
+2. GRX premium feed flow
+GRX premium starts from ttransaction, not from claim tables.
+
+The premium source subquery aggregates ttransaction by accounting month. It joins ttransaction.accounting_dt_sk to tdate.date_sk, filters the date to tdate.year_month_ct = in_ym, and groups at a fairly granular transaction level: endorsement number, policy, coverage, transaction type, transaction date, accounting date, effective date, and accounting month. It sums premium_am and tax_fee_srchrg_am before joining to policy and reference tables .
+
+After that aggregation, the data is enriched with:
+
+tpolicy through policy_sk
+tcustomer in the premium feed path
+tcoverage
+tpolicy_type
+tpim_coverage
+tpel_coverage
+ttransaction_type
+tuw_company
+trisk_state_country
+three tdate aliases for transaction, accounting, and effective dates
+tprocessing_office
+GRX enters through this filter branch:
+
+a.source_system_nm IN ('Manual', 'Program Connect')
+a.source_system_sk NOT IN (2, 14)
+TRIM(a.policy_type_cd) IN ('EPLI', 'EQ', 'EXFL', 'GRX', 'PC')
+plus AIWCS/WC as a separate included branch
+c.premium_am <> 0
+That means GRX is bundled with EPLI, EQ, EXFL, and PC in the broad “all other/manual specialty” path. It is not handled in the PE-only branch. The PE-only branch has its own separate condition TRIM(a.policy_type_cd) = 'PE', with GRX only visible inside an old/commented broader list in that PE section .
+
+3. Product coding: GRX becomes GEX downstream
+The package does not simply write GRX everywhere. It uses tpolicy_type.pol_type_wins_cd for downstream product coding.
+
+In the loss mapping, the package explicitly maps:
+
+GEX to line of business 171
+AIG-PRODUCT as g.pol_type_wins_cd
+blank AIG-SUB-LINE
+blank AIG-INTERNAL-COVERAGE for non-PIM/YIP/PEL products
+So the conceptual flow is:
+
+TPOLICY.POLICY_TYPE_CD = 'GRX'
+→ join to TPOLICY_TYPE
+→ TPOLICY_TYPE.POL_TYPE_WINS_CD = 'GEX'
+→ Fiserv/AIG product field becomes GEX
+→ line of business becomes 171
+
+That distinction matters for validation: if you filter final feed/control output by GRX, you may miss it; product-level control likely shows it as GEX.
+
+4. Premium amount behavior
+For GRX premium, the source amount basis is from the aggregated ttransaction values:
+
+SUM(t1.premium_am) as premium_am
+SUM(tax_fee_srchrg_am) as tax_fee_srchrg_am
+The feed builds a fixed-width premium record by concatenating many fields, including:
+
+policy number
+policy effective date
+account-related fields
+written exposure / earned exposure fields
+premium transaction code
+account date
+written premium
+inforce premium
+earned premium
+current unearned premium
+collected premium / commission fields
+For controls, the manual premium control table is STAGE_MISREG.stage_premium_control_details. It deletes the existing param_num = in_ym, then inserts one concatenated control record per product with these buckets:
+
+PE-WRITTEN-PREM
+HOP80-WRITTEN-PREM
+HOP20-WRITTEN-PREM
+YIP80-WRITTEN-PREM
+YIP20-WRITTEN-PREM
+ALL-WRITTEN-PREM
+The control record concatenation clearly includes AIG-PRODUCT plus all those written premium/count buckets . Since GRX is not PE/HOP/YIP, it flows into the ALL-WRITTEN-PREM / ALL-WRITTEN-PREM-COUNT side of the manual premium control logic. The later control branch again shows the broad included policy list containing GRX and groups by AIG-PRODUCT .
+
+5. Account enrichment for GRX premium records
+Before the premium record is finalized, the premium feed joins to an account premium CTE named acc_prm.
+
+That account enrichment is built from:
+
+STAGE_MISREG.stage_account_prm_hist_details
+STAGE_MISREG.stage_account_prm_hist_lexdet
+joined to tdate
+filtered to the in_ym month
+only active rows where active_in = 'Y'
+The final premium record then left joins main_qry to acc_prm using policy number, policy effective date, and account number, and uses AIG-ACCOUNT#_B when available, otherwise AIG-ACCOUNT#_A .
+
+That means GRX premium records can carry account enrichment only if the corresponding policy/effective/account combination exists in the account premium history staging tables for that month.
+
+6. Important GRX premium exclusion nuance
+There is one very important code nuance: in the broad manual GRX branch, the wins_uw_cd suffix exclusion and Canada exclusion appear attached to the tprocessing_office left join condition in the retrieved snippet, not as a standalone WHERE filter. The visible broad branch shows TRIM(substr(b.wins_uw_cd,3,2)) NOT IN ('51','61') and TRIM(n.risk_country_nm) <> 'CANADA' inside the LEFT JOIN tprocessing_office ... ON block, while the actual WHERE clause is the source-system/product-type/premium filter .
+
+That is different from the PE-only branch, where those exclusions appear in the WHERE clause . Practically, for GRX, you should verify in the actual database execution whether those conditions are intended to exclude rows or only suppress the processing-office join. Based on the visible code, they do not behave like a true row-level exclusion in that branch.
+
+7. GRX claims flow
+GRX claims flow through the manual claims path if the associated policy maps to Group Excess and the claim transactions meet the source-system/date filters.
+
+For manual claims control/feed logic, the package starts with tclaim_transaction, joins it to tdate through transaction_dt_sk, and then joins:
+
+tclaim using claim_sk
+tpolicy using the policy on the claim
+tclaim_features using claim_feature_sk
+ttransaction_type
+tuw_company
+tlosstype
+tpolicy_type
+coverage tables
+risk state/country
+processing office
+For manual claims, visible filters include:
+
+current-month paid/recovery transaction selection using t4.month_acctng_ct = in_ym
+policy type not equal to HP
+UW company suffix not in 51, 61
+claim transaction source systems in (6, 7, 15)
+For paid loss, the package pulls rows where t3.loss_paid_am <> 0 for the current accounting month and joins through tclaim.claim_sk = tclaim_transaction.claim_sk before building the loss record fields . For expense paid, it similarly selects expense_paid_am <> 0 for the current accounting month . For salvage/subro, it selects rows where either salvage_recovery_am or subro_recovery_am is nonzero for the current accounting month .
+
+The loss record maps:
+
+RECORD-TYPE = 'L'
+LOSS-DATE from tclaim.loss_dt
+CLAIM-NUM from tclaim.claim_no
+LINE-OF-BUSINESS: GEX → 171
+AIG-PRODUCT: tpolicy_type.pol_type_wins_cd
+AIG-LOSS-CODE = 'PRP'
+So for a GRX claim, the end record is not really “GRX” in the product field; it should appear as GEX, assuming tpolicy_type maps GRX to GEX.
+
+8. Claims control rollup for GRX
+Manual claims control writes to STAGE_MISREG.stage_loss_control_details, again deleting existing rows for the month and inserting concatenated control output. The control groups by AIG-PRODUCT, so all GRX/GEX losses are aggregated at the product level, not claim level .
+
+That means a GRX claim-level detail validation must be done before the final control output. Once it reaches the control table, you only have product-level totals such as:
+
+current-cycle paid loss
+current-cycle paid LAE
+current-cycle salvage loss
+current-cycle subro loss
+outstanding loss reserve
+outstanding LAE reserve
+associated counts
+The control table is for reconciliation totals, not row-level debugging.
+
+9. GRX is not in the newer DC/Instanda premium branch
+The DC/Instanda premium logic has a different product filter. The visible Instanda/DC premium branch includes policy types:
+
+AU, PE, EXFL, PC, EQ, CAU, YHT
+
+and source systems 16, 17, 18, 19, 20, 21 . GRX is not in that list. So if a policy is truly GRX, the code shown does not place it into that newer DC/Instanda premium path.
+
+That is a major validation point: if you are looking at a source_system_sk 20/21 policy and expecting GRX to flow like PC3/Instanda, this package logic does not show GRX included there. GRX is visible in the older manual/program-connect broad branch, not the DC/Instanda product filter.
+
+10. Practical validation implications
+For GRX premium validation:
+
+Source table should be ttransaction.
+Join to tpolicy by policy_sk.
+Filter tpolicy.policy_type_cd = 'GRX'.
+Use accounting month through ttransaction.accounting_dt_sk = tdate.date_sk and tdate.year_month_ct = in_ym.
+Use premium_am aggregation at the same grain as the package: endorsement, policy, coverage, transaction type, transaction/accounting/effective dates.
+Compare downstream product as GEX, not GRX, if validating Fiserv/control product output.
+For GRX claims validation:
+
+Source table should start with tclaim_transaction.
+Join to tclaim by claim_sk.
+Join to tpolicy only to identify product/policy attributes.
+Use current-month transaction date for paid loss, paid expense, salvage, subro.
+Use cumulative month logic for reserves if validating reserve control amounts.
+Compare product output as GEX, and line of business as 171.
+Bottom line: GRX enters the package as TPOLICY.POLICY_TYPE_CD = 'GRX', but it flows downstream as product GEX, line of business 171, through the manual premium/claims feed and control paths. Premium GRX rolls into the ALL written-premium control bucket; claims GRX rolls into product-level loss control under AIG-PRODUCT = GEX.
+
+so if i want to add source_system_sk =(23,24) - this is for GRX product policy inside MANUAL
+existing system.
+and salesforce is the source_system_nm
+what all changing condition would help .
+and what is the filter condition inside MANUAL for GRX policies to flow correctly like others... and it wont get rejected.?
+
+Toggles message in favorites.
+"Code Generated by Sidekick is for learning and experimentation purposes only. For other use cases, please see the guidance linked here for accessing and using the Deloitte-approved tools GitHub Copilot or AWS Codewhisperer.
+
+Short answer
+For GRX from Salesforce source systems 23/24, the safest change is not to broadly add Salesforce into the existing Manual / Program Connect condition. Instead, add a GRX-specific OR condition wherever the package currently allows Manual / Program Connect GRX.
+
+Why: the current Manual premium logic already includes GRX in the policy-type list, but only when a.source_system_nm IN ('Manual','Program Connect'); therefore Salesforce GRX gets rejected because of the source-system-name filter, not because of policy type. The visible premium branch filters a.source_system_nm IN ('Manual','Program Connect'), excludes only source systems 2,14, and allows policy types EPLI, EQ, EXFL, GRX, PC .
+
+1. Existing Manual GRX premium filter
+Current broad Manual premium branch condition is effectively:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: grx-manual-premium-condition.sql
+(
+    (
+        a.source_system_nm IN ('Manual', 'Program Connect')
+        AND a.source_system_sk NOT IN (2, 14)
+        AND TRIM(a.policy_type_cd) IN ('EPLI', 'EQ', 'EXFL', 'GRX', 'PC')
+    )
+    OR (
+        a.source_system_nm = 'AIWCS'
+        AND TRIM(a.policy_type_cd) = 'WC'
+    )
+)
+AND c.premium_am <> 0
+That means GRX is already eligible only if:
+
+TPOLICY.SOURCE_SYSTEM_NM is Manual or Program Connect
+TPOLICY.SOURCE_SYSTEM_SK is not 2 or 14
+TPOLICY.POLICY_TYPE_CD = 'GRX'
+transaction premium is nonzero
+The issue with Salesforce is this: even though 23/24 are not excluded by NOT IN (2,14), the row still fails because SOURCE_SYSTEM_NM = 'Salesforce' is not in ('Manual','Program Connect').
+
+2. Recommended premium condition change
+Use this safer condition:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: grx-salesforce-premium-condition.sql
+(
+    (
+        a.source_system_nm IN ('Manual', 'Program Connect')
+        AND a.source_system_sk NOT IN (2, 14)
+        AND TRIM(a.policy_type_cd) IN ('EPLI', 'EQ', 'EXFL', 'GRX', 'PC')
+    )
+    OR (
+        a.source_system_nm = 'Salesforce'
+        AND a.source_system_sk IN (23, 24)
+        AND TRIM(a.policy_type_cd) = 'GRX'
+    )
+    OR (
+        a.source_system_nm = 'AIWCS'
+        AND TRIM(a.policy_type_cd) = 'WC'
+    )
+)
+AND c.premium_am <> 0
+This lets only Salesforce GRX flow through the Manual-style GRX path. It does not accidentally allow Salesforce EPLI, EQ, EXFL, or PC unless you explicitly want that later.
+
+3. Where to make this change
+You need to update this logic in every Manual premium location where the same broad product branch exists.
+
+Based on the uploaded code, this condition appears in the Manual premium feed / account enrichment path and in Manual premium control logic. The premium extract starts from TTRANSACTION, joins to TDATE, then joins TPOLICY, TCOVERAGE, TPOLICY_TYPE, transaction type, UW company, risk state/country, and other lookup tables before applying the Manual/Program Connect policy filter . The same broad Manual branch is also visible in the premium control load, where GRX is included with EPLI, EQ, EXFL, and PC .
+
+So at minimum, check and update:
+
+prc_premium_feed_load
+prc_premium_control_load
+Do not change the PE-only branch. There is a separate condition where TRIM(a.policy_type_cd) = 'PE'; that branch is not for GRX, even though comments show an older broader product list beside it .
+
+4. Existing Manual GRX rejection points
+For Salesforce GRX to flow correctly, it must survive all these filters.
+
+Premium-side filters
+Filter	Current behavior	Salesforce GRX impact
+a.source_system_nm IN ('Manual','Program Connect')	Allows only Manual/Program Connect	Rejects Salesforce
+a.source_system_sk NOT IN (2,14)	Excludes only 2/14	23/24 pass
+TRIM(a.policy_type_cd) IN (...,'GRX',...)	Allows GRX	GRX passes
+c.premium_am <> 0	Requires nonzero premium	zero premium rejected
+ttransaction.accounting_dt_sk = tdate.date_sk and month = in_ym	Monthly accounting selection	must have transaction in run month
+ttransaction amount condition	requires premium or tax-fee condition before grouping	transaction must qualify
+The premium source subquery includes transactions for the run month where accounting_dt_sk maps to tdate.date_sk, year_month_ct = in_ym, and either premium is nonzero or tax-fee surcharge condition is met . But in the final broad Manual branch, the visible filter is specifically c.premium_am <> 0, so Salesforce GRX premium rows with only tax/fee and no premium may still not flow in that branch.
+
+UW / Canada nuance
+In the broad Manual premium branch, the uploaded code shows these conditions attached to the LEFT JOIN tprocessing_office join condition:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: grx-processing-office-join.sql
+AND TRIM(SUBSTR(b.wins_uw_cd, 3, 2)) NOT IN ('51', '61')
+AND TRIM(n.risk_country_nm) <> 'CANADA'
+Because they are attached to a LEFT JOIN, they may suppress the processing-office match rather than reject the entire row in that specific branch. The broad Manual condition itself still focuses on source system, policy type, and premium amount . This is different from the PE-only branch, where the UW and Canada filters appear directly in the WHERE clause and therefore act as row-level rejection filters .
+
+So for GRX/Salesforce premium, the main rejection point is definitely source-system name, not UW/Canada, based on the visible broad branch.
+
+5. Claims side must be changed separately
+For claims, the visible Manual claims code does not filter using a.source_system_nm = 'Manual'. It filters claim transaction rows using l.source_system_sk IN (6,7,15) after joining TCLAIM_TRANSACTION to TCLAIM, TPOLICY, TCLAIM_FEATURES, policy type, UW company, etc. The loss-paid branch shows TCLAIM_TRANSACTION filtered to current accounting month, joined to TCLAIM by claim_sk, then joined to TPOLICY, and finally filtered by l.source_system_sk IN (6,7,15) . Similar source-system filtering appears in the recovery branches as well .
+
+So if Salesforce GRX claim transactions have TCLAIM_TRANSACTION.SOURCE_SYSTEM_SK IN (23,24), they will be rejected today.
+
+Recommended safer Manual claims condition:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: grx-salesforce-claims-condition.sql
+AND (
+       l.source_system_sk IN (6, 7, 15)
+    OR (
+           l.source_system_sk IN (23, 24)
+       AND TRIM(g.policy_type_cd) = 'GRX'
+    )
+)
+That should replace this existing claims condition:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: existing-manual-claims-condition.sql
+AND l.source_system_sk IN (6, 7, 15)
+Important: apply this in every Manual claims union block, not just one. From the uploaded file, the same Manual claims pattern appears for:
+
+paid loss
+paid expense
+salvage/subro recovery
+other recovery
+reserve logic
+claims control equivalents
+The visible claim branches show current-month paid/recovery logic using transaction date/month, and the same l.source_system_sk IN (6,7,15) rejection point appears in those branches .
+
+6. Should you add 23/24 to existing Manual list directly?
+Technically, this would work:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: broad-salesforce-manual-condition.sql
+a.source_system_nm IN ('Manual', 'Program Connect', 'Salesforce')
+AND a.source_system_sk NOT IN (2, 14)
+AND TRIM(a.policy_type_cd) IN ('EPLI', 'EQ', 'EXFL', 'GRX', 'PC')
+But I do not recommend it unless the business confirms Salesforce should feed all those products. This broad change could allow Salesforce EPLI, EQ, EXFL, and PC into the Manual branch too.
+
+For your stated requirement — GRX product only, source systems 23/24, source name Salesforce — the safer production change is the explicit GRX-only OR.
+
+7. Best final condition pattern
+Use this for premium feed/control:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: final-grx-premium-filter.sql
+WHERE
+    (
+        (
+            a.source_system_nm IN ('Manual', 'Program Connect')
+            AND a.source_system_sk NOT IN (2, 14)
+            AND TRIM(a.policy_type_cd) IN ('EPLI', 'EQ', 'EXFL', 'GRX', 'PC')
+        )
+        OR (
+            a.source_system_nm = 'Salesforce'
+            AND a.source_system_sk IN (23, 24)
+            AND TRIM(a.policy_type_cd) = 'GRX'
+        )
+        OR (
+            a.source_system_nm = 'AIWCS'
+            AND TRIM(a.policy_type_cd) = 'WC'
+        )
+    )
+    AND c.premium_am <> 0
+Use this for Manual claims feed/control:
+
+
+SQL
+
+
+-- Code Generated by Sidekick is for learning and experimentation purposes only.
+-- filename: final-grx-claims-filter.sql
+WHERE
+    TRIM(g.policy_type_cd) <> 'HP'
+    AND TRIM(SUBSTR(b.wins_uw_cd, 3, 2)) NOT IN ('51', '61')
+    AND (
+           l.source_system_sk IN (6, 7, 15)
+        OR (
+               l.source_system_sk IN (23, 24)
+           AND TRIM(g.policy_type_cd) = 'GRX'
+        )
+    )
+8. One more critical mapping check
+For GRX, do not only validate TPOLICY.POLICY_TYPE_CD = 'GRX'. Downstream product output may use TPOLICY_TYPE.POL_TYPE_WINS_CD, not the raw GRX policy type. The package joins TPOLICY_TYPE on TRIM(a.policy_type_cd) = TRIM(m.policy_type_cd) in the premium branch and uses policy-type joins in claims as well . So if GRX is expected to output as GEX, confirm the TPOLICY_TYPE reference data for Salesforce GRX has the same mapping as existing Manual GRX.
+
+9. Regression checklist before promoting
+Validate these before moving code:
+
+Salesforce GRX policies have:
+
+SOURCE_SYSTEM_NM = 'Salesforce'
+SOURCE_SYSTEM_SK IN (23,24)
+POLICY_TYPE_CD = 'GRX'
+TTRANSACTION rows exist in the run month:
+
+accounting_dt_sk maps to TDATE.YEAR_MONTH_CT = in_ym
+premium_am <> 0
+TPOLICY_TYPE has GRX mapping:
+
+POLICY_TYPE_CD = 'GRX'
+expected downstream product code, likely GEX
+Claims, if applicable:
+
+TCLAIM_TRANSACTION.SOURCE_SYSTEM_SK IN (23,24)
+TCLAIM_TRANSACTION.CLAIM_SK joins to TCLAIM.CLAIM_SK
+claim policy maps to GRX
+paid/recovery rows are in current accounting month
+reserve rows follow the cumulative reserve month logic
+Apply changes consistently:
+
+premium feed
+premium control
+claims feed
+claims control
+Bottom line: to make Salesforce GRX flow inside the existing Manual-style path without bringing unwanted products, add a GRX-specific Salesforce OR branch using SOURCE_SYSTEM_SK IN (23,24) and POLICY_TYPE_CD = 'GRX'. For claims, separately add 23/24 to the TCLAIM_TRANSACTION source-system filter, also guarded by GRX.
+
+so for claims...AND l.source_system_sk IN (6, 7, 15) inside which procedure is present in this
+
+Toggles message in favorites.
+"Code Generated by Sidekick is for learning and experimentation purposes only. For other use cases, please see the guidance linked here for accessing and using the Deloitte-approved tools GitHub Copilot or AWS Codewhisperer.
+
+Direct answer
+The claims condition AND l.source_system_sk IN (6, 7, 15) is present inside the manual claims procedures, mainly:
+
+prc_claims_feed_load
+
+This is the manual claims detail/feed procedure.
+It loads the manual loss feed detail records.
+The condition appears inside the claim transaction extract blocks where alias l is created from tclaim_transaction.
+The code shows l coming from tclaim_transaction t3 joined to tdate t4, then joined to tclaim d using d.claim_sk = l.claim_sk; after joining policy, claim feature, transaction type, UW company, policy type, coverage, risk state, etc., it filters with TRIM(g.policy_type_cd) <> 'HP', UW suffix not in 51/61, and l.source_system_sk IN (6, 7, 15) .
+The procedure ends as END prc_claims_feed_load, confirming this block belongs to the manual claims feed area before prc_premium_control_load starts .
+prc_claims_control_load
+
+This is the manual claims control procedure.
+It loads STAGE_MISREG.stage_loss_control_details.
+The procedure starts with module name $$plsql_unit || '.MANUAL_CLAIMS_CONTROL', deletes stage_loss_control_details for param_num = in_ym, then inserts the product-level control record .
+The control procedure reuses the manual claims transaction logic and ends as END prc_claims_control_load .
+Where inside the claims logic it appears
+Within the manual claims SQL, this source-system filter appears in multiple claim amount blocks, not just one. The search results show it under these claim transaction types:
+
+Paid loss block: source subquery filters t3.loss_paid_am <> 0, joins to tdate, month equals in_ym, then applies l.source_system_sk IN (6, 7, 15) after joins .
+Salvage/Subro recovery block: source subquery filters t3.salvage_recovery_am <> 0 OR t3.subro_recovery_am <> 0, then applies the same source-system filter .
+Other recovery block: source subquery filters t3.other_recovery_am <> 0, then applies the same source-system filter .
+Based on the package structure, if you are adding Salesforce GRX claim source systems 23/24, you should review and update the condition in both manual claim places:
+
+prc_claims_feed_load
+prc_claims_control_load
+Main orchestration confirms both are manual flow
+The main procedure prc_policy_data_load calls these in order:
+
+prc_premium_feed_load
+prc_claims_feed_load
+prc_premium_control_load
+prc_claims_control_load
+That confirms the manual claims feed runs before manual claims control, and both are part of the same manual monthly flow before the later CIP/DC routines .
+
+Practical takeaway for GRX Salesforce change
+For claims, do not only update one occurrence. The filter is embedded inside repeated manual claim transaction blocks. If Salesforce GRX claim transactions use source_system_sk 23 or 24, then every relevant manual claims block using l.source_system_sk IN (6, 7, 15) needs the same guarded change.
+
+Best target locations:
+
+prc_claims_feed_load: claim detail feed rows
+prc_claims_control_load: product-level loss control totals
+Do not change DC/CIP claims procedures for this specific requirement unless Salesforce GRX is also expected to flow through DC/CIP logic, which your current statement says it is not.
+so this is the complete data stage job of SRM in txt format... do advanced level research now... and understand everything and tell me 
+first of all tell me how GRX - group excess data is flowing? explain me everything
+so if i want to add source_system_sk =(23,24) - this is for GRX product policy inside MANUAL
+existing system.
+and salesforce is the source_system_nm
+what all changing condition would help .
+and what is the filter condition inside MANUAL for GRX policies to flow correctly like others... and it wont get rejected.?
+so for claims...AND l.source_system_sk IN (6, 7, 15) inside which procedure is present in this
+
+tell all the changes that must be done.. to get the integration for GRX ... in the procedure stone_river and the job level changes required... do looping till you dont get the solution .
