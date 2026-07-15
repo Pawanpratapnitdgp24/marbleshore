@@ -1,3 +1,8 @@
+so this is the complete updated code , i gave is the code according to the changes you told... but still no GRX policies are flowing.. do advanced level research for the updated package and tell if something i am missing... do looping to understand the issue.. 
+
+
+
+
 create or replace PACKAGE BODY pkg_stone_river_data_load AS
   /************************************************************************************************************************
 
