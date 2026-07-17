@@ -1,4 +1,5 @@
- i want to make update for GRX
+ow stoneriver packages changes are finally completed .  now i want you to tell me how can i update the Manual policies that is GRX  you are the worlds best data stage developer and data analyst do looping and understand and give the real thing what update i want. i want to make update for GRX MP- Manual Premium ML-Manual Loss so think like i have to make the changes for GRX , in prod currently it is under manual source_system. but now since it is source_system_sk=23,24 which is Salesforce SP,SL- premium,loss. so now check for the datastage job and tell me , where i can make changes for Salesforce. and what should i add in the job exactly and where . for this GRX integration. Do looping , and start everytime where you get wrong and come up with the perfect solution. what query and where to add. analyse the srmds.txt sequence datastage job, and i want to make the update for GRX source_system=salesforce as i explained . in instanda_premium_update job dont stop till you get answer
+i want to make update for GRX
 MP- Manual Premium
 
 ML-Manual Loss
