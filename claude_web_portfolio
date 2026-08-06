@@ -1,0 +1,396 @@
+THE COMPLETE MASTER PROMPT
+
+You are the world's best frontend engineer and product designer. You have shipped production websites for engineers at Apple, Vercel, Linear, Stripe, and Raycast. Your design taste is surgical. Your code is flawless.
+
+Your single goal: Build a complete, self-contained index.html that feels like Apple and Linear collaborated to launch a new product — except the product is a person: Pawan Pratap Singh Chauhan, Cloud Data Engineer at Deloitte.
+
+This is NOT a portfolio. This is a premium SaaS product page where the engineer is the product.
+
+DESIGN RESEARCH — WHAT THE BEST SITES DO IN 2026
+
+You have studied the following and must apply their techniques:
+
+Linear (linear.app): Dark-by-default. Monochrome discipline. Kinetic typography. Technical-document labels (FIG 0.1). Bento grid features. Cursor-triggered micro-interactions. Heavy whitespace. The page feels like a precision engineering instrument.
+
+Vercel (vercel.com): Extreme whitespace discipline. Serif display + clean body. Trust built through specificity — real numbers, real names. No fluff. The hero headline is one sentence. Every pixel justified.
+
+Stripe (stripe.com): Social proof architecture. Logos immediately visible. Metrics used surgically — one number per idea. Gradient used once, in the hero, never again. Sections connect narratively.
+
+Raycast (raycast.com): Deep graphite background. Frosted glass cards. Slow ambient glow. Keyboard-shortcut aesthetic. Everything feels like a developer tool you trust.
+
+Apple WWDC bento grids: Asymmetric cell sizes. Each cell does one job. Hover = card lifts + border brightens. No animation inside the cell unless it reveals information.
+
+What sets the best apart in 2026:
+
+Noise texture overlay (SVG-based, 3–5% opacity) over the background — makes dark feel expensive, not flat
+Cursor spotlight effect — a radial gradient follows the mouse across hero section only
+Kinetic type — one word cycles through values (e.g., "scalable / reliable / enterprise-grade") using CSS animation
+Bento grid for the "about" section — asymmetric, each cell holds exactly one fact
+Section labels styled as technical annotations: [ 01 — EXPERIENCE ] not "Experience"
+Scroll-triggered counter animation for metrics — numbers count up when section enters viewport
+Timeline drawn by CSS — the vertical line grows via scaleY animation tied to scroll
+Certificate cards with uniform height images — object-fit: cover, object-position: top center, never distorted
+Tag chips styled as terminal tokens — monospace font, subtle background, no bright colors
+Contact section styled as a product CTA — not a form, a decision moment
+WHO THE PRODUCT IS — READ EVERY WORD
+
+Name: Pawan Pratap Singh Chauhan
+Title: Cloud Data Engineer
+Company: Deloitte USI · Hyderabad, India
+Education: B.Tech Computer Science · NIT Durgapur · CGPA 8.5 · 2020–2024
+Email: pawanpratapnitdgp24@gmail.com
+Phone: +91-8112720743
+
+The accurate 55-word summary (use this, do not rewrite it into marketing copy):
+"Cloud Data Engineer with 2+ years of experience modernizing enterprise-scale data platforms at Deloitte. I migrate legacy IBM DataStage and Oracle PL/SQL insurance systems to AWS-native architectures using PySpark, Snowflake, AWS Glue, and Databricks. Outside work, I build GenAI applications and research Hybrid Quantum Machine Learning."
+
+EXPERIENCE — EXACT RESUME CONTENT, NO INFLATION
+
+Deloitte USI · Cloud Data Engineer · Apr 2024 – Present
+
+Modernized legacy enterprise insurance reporting: migrated IBM DataStage ETL workflows and Oracle PL/SQL business logic to AWS-native pipelines
+Built AWS Glue ingestion pipelines from policy administration, claims, SRM, and financial systems into Amazon S3 data lake — schema validation, incremental loading, metadata-driven processing, data quality checks, audit logging
+Re-engineered Oracle PL/SQL packages into reusable PySpark transformation frameworks — preserved insurance business rules: policy lifecycle, premium calculations, claims categorization, effective dating, financial transformations
+Built high-performance distributed ETL using PySpark, Spark SQL, window functions, broadcast joins, partitioning, caching, optimized execution plans for large-scale cleansing, enrichment, deduplication, incremental processing
+Architected Snowflake staging, curated, and reporting layers using ELT, dimensional modeling, optimized SQL, stored procedures — delivered analytics-ready datasets and reporting data marts
+Collaborated with architects, analysts, and 13-member engineering team — sprint delivery, production issue resolution, junior developer mentoring
+Awards: Spot Award ×3 · Best Performer of the Quarter · AIG Client Recognition Award · Deloitte USI 2025
+
+Celebal Technologies · ML Engineering Intern · Aug 2023 – Jan 2024
+
+Built Hybrid Quantum CNN (QCNN + Variational Quantum Circuit) for Diabetic Retinopathy detection on IBM Cloud — accuracy improved from 56% to 98%
+Research presented at Celebal Technologies, Jaipur
+Designed Python ETL pipelines (Pandas, Qiskit) for quantum feature transformation; managed versioned data assets across IBM Cloud with 100% integrity
+Gold Certificate — Best Performer among 700+ interns · Speaker, Celebal Technologies Jaipur 2023
+
+IIT Roorkee · AI Research Trainee · May 2023 – Jul 2023
+
+Intensive applied AI/ML program — model development, data preprocessing, feature engineering, business problem-solving
+PROJECTS — EXACT RESUME CONTENT
+
+Project 1 — RAG-Based Data Retrieval Platform (Jan 2025 – Present)
+Stack: Python · PySpark · Astra DB · AWS · REST APIs · Streamlit
+
+Designed scalable multi-source vector-search pipeline (Astra DB) — 100K+ records, improved retrieval accuracy
+Pitched at IIT Roorkee — advanced through initial innovation review, received positive feedback for technical feasibility, scalability, and commercial potential
+
+Project 2 — Medical Chatbot · LangChain + AWS (Feb 2025 – Apr 2025)
+Stack: Flask · AWS S3/Lambda · Pinecone · LangChain
+
+Cloud-native RAG architecture on AWS — automated Pinecone ingestion, secure REST API, 40% higher domain retrieval accuracy, 99.9% uptime
+Deloitte Hack-on Finalist · Top 10 out of 200+ teams
+
+Project 3 — Hybrid Quantum CNN · Diabetic Retinopathy (Celebal Technologies, 2023)
+Stack: Python · Qiskit · IBM Cloud · Pandas
+
+Quantum CNN + Variational Quantum Circuit — accuracy 56% → 98%
+Research presented at Celebal Technologies, Jaipur
+Gold Certificate · Best Performer / 700+ interns
+ACHIEVEMENTS — EXACT, DO NOT APPROXIMATE
+IIT JEE: AIR 3,626 in Mains (Top 0.3%) · AIR 11,036 in Advanced — secured NIT Durgapur admission
+Deloitte Hack-on: Top 10 out of 200+ teams
+Smart India Hackathon: Finalist 2024
+IONathon 1.0: Top 10 out of 3,000+ teams
+Publicis Sapient Jumpstart: Pre-Finalist out of 30,000+ participants
+NIT Durgapur Startup Fellowship: Selected
+Gold Certificate: Best Performer among 700+ interns — Celebal Technologies
+Speaker: Celebal Technologies, Jaipur 2023
+CodeChef: 1,583 rating (2 Stars) · 400+ problems solved across LeetCode, GFG, CodeChef
+CERTIFICATIONS — WITH EXACT IMAGE FILENAMES
+
+Display all 8. Each card: image (top, 160px fixed height, object-fit:cover, object-position:top center) + issuer + name + date below.
+
+Google Cloud — Professional Cloud Architect · Feb 2025–Feb 2027 · image: Screenshot_2026-05-18_180226.png
+Google Cloud — Associate Cloud Engineer · Nov 2024–Nov 2027 · image: Screenshot_2026-05-18_180304.png
+Databricks — Certified Data Engineer Associate · May 2026–May 2028 · image: Screenshot_2026-05-18_175104.png
+Snowflake — SnowPro Advanced: Data Engineer · May 2026–May 2028 · image: Screenshot_2026-05-18_175121.png
+Snowflake — SnowPro Core Certified · Apr 2026–Apr 2028 · image: Screenshot_2026-05-18_175134.png
+IIT Roorkee × Deloitte AI Academy — AI & Machine Learning · Aug 2024 · image: Screenshot_2026-05-18_175156.png
+Deloitte AI Academy™ — USI AI Certification · Sep 2024 · image: Screenshot_2026-05-18_175211.png
+Celebal Technologies × Microsoft — React JS Internship · Jul 2023 · image: Screenshot_2026-05-18_175336.png
+IMAGES — PLACEMENT AND EXACT TREATMENT
+
+Image 1: ChatGPT_Image_May_18__2026__05_38_02_PM.png
+This is a 3-panel professional composite: award ceremony left, laptop working center, dual-monitor coding right.
+→ HERO SECTION only. Display as a tall portrait card: width: 380px, height: 500px, border-radius: 20px, overflow: hidden, object-fit: cover, object-position: center top. Add two floating pill badges: bottom-left = "🏆 Spot Award ×3 · Deloitte", top-right = "GCP Certified". These badges use backdrop-filter: blur(12px), dark semi-transparent background, small font, and a single 1px border.
+
+Image 2: my_image_2.png
+Award ceremony at Deloitte stage with confetti falling. Professional and dramatic.
+→ AWARDS SECTION only. Display as a tall portrait: width: 100%, aspect-ratio: 3/4, max-width: 340px, object-fit: cover, object-position: top center, border-radius: 16px. Overlay at bottom: dark gradient + "Deloitte Excellence Award · Innovation in Technology · 2025" label text inside the image.
+
+Image 3: my_image.png
+Deloitte office — team collaborating at desks with code on screens.
+→ EXPERIENCE SECTION background. Use as a full-width atmospheric background behind the Deloitte experience card: background-image: url(my_image.png), background-size: cover, background-position: center, overlaid with a dark gradient rgba(9,9,11,0.88) so the image is subtly visible but text is perfectly legible.
+
+Certificate images: Exactly 3-column grid. Each card border-radius: 12px, overflow: hidden, border: 1px solid rgba(255,255,255,0.06). Image container inside each card: height: 160px, overflow: hidden. img inside: width: 100%, height: 100%, object-fit: cover, object-position: top center. On hover: border-color: rgba(59,130,246,0.3), card translateY(-3px). Every <img> has onerror="this.style.background='#1a2035'".
+
+DESIGN SYSTEM — ABSOLUTE, DO NOT DEVIATE
+--bg:           #09090B    ← true near-black, not navy
+--surface:      #0F0F12    ← cards, slightly lighter
+--surface2:     #141418    ← hover states
+--glass:        rgba(255,255,255,0.03)  ← frosted panels
+--border:       rgba(255,255,255,0.06)
+--border-hover: rgba(255,255,255,0.12)
+--accent:       #3B82F6    ← electric blue, used SPARINGLY
+--accent-glow:  rgba(59,130,246,0.15)
+--violet:       #7C3AED    ← secondary, used VERY sparingly
+--text:         #F8FAFC
+--text2:        #94A3B8
+--text3:        #475569
+--mono:         'JetBrains Mono', monospace  ← for tags, labels, code
+
+Noise texture: Add this as the very first child of <body>:
+
+html
+<div class="noise" aria-hidden="true"></div>
+css
+.noise {
+  position: fixed; inset: 0; z-index: 999; pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 128px;
+}
+
+Fonts: Load from Google Fonts:
+
+Instrument+Serif:ital@0;1   ← hero name, section titles only
+Inter:wght@300;400;500;600  ← all body text
+JetBrains+Mono:wght@400;500 ← tags, labels, annotations, code
+
+Grid system: max-width: 1200px, margin: 0 auto, padding: 0 48px. On mobile: padding: 0 20px.
+
+SECTIONS — EXACT SPECIFICATION
+NAV
+
+Fixed. height: 60px. backdrop-filter: blur(20px). background: rgba(9,9,11,0.85). border-bottom: 1px solid var(--border).
+
+Left: "PSC" monogram in a 28px × 28px box, 1px border, font-family: mono, 11px. Next to it: "Pawan Pratap Singh Chauhan" in Inter 13px medium.
+Center (desktop only): 5 links — About · Experience · Projects · Certifications · Awards · Contact — Inter 13px, color: var(--text3), hover → var(--text2), active section → var(--text).
+Right: "Download Resume" — ghost button, 12px, mono font, padding: 6px 14px, border: 1px solid var(--border-hover).
+HERO
+
+Full viewport height. Two-column grid: 65fr 35fr. Vertically centered.
+
+Left column — stacked vertically:
+
+Status pill: [ AVAILABLE FOR OPPORTUNITIES ] — JetBrains Mono 10px, color: var(--accent), border: 1px solid rgba(59,130,246,0.3), background: rgba(59,130,246,0.06), border-radius: 100px, padding: 5px 14px. Pulsing green dot before text → actually blue, use accent.
+Name: "Pawan Pratap Singh Chauhan" — Instrument Serif, font-size: clamp(42px, 5.5vw, 72px), letter-spacing: -0.03em, line-height: 1.05.
+Role line: "Cloud Data Engineer" — Inter 300 weight, 20px, color: var(--text2).
+Kinetic subtitle: One line where a word cycles. Structure:
+   Building [WORD] data platforms for enterprise.
+
+WORD cycles through: scalable → reliable → distributed → cloud-native → production-grade
+CSS-only: use @keyframes with animation-iteration-count: infinite. The word fades out/in with opacity and clip-path. Style the word in color: var(--accent), font-style: italic, Instrument Serif.
+5. Body paragraph: the accurate 55-word summary above. Inter 15px, line-height: 1.75, color: var(--text2), max-width: 520px.
+6. Metrics row — 3 items separated by |:
+
+2+ yrs · Cloud Data Engineering
+Spot Award ×3 · Deloitte USI
+AIR 3,626 · IIT JEE Top 0.3%
+Each: JetBrains Mono, 11px label muted, 18px value in var(--text).
+CTA buttons row:
+Primary: "View My Work" — background: var(--accent), color: #000, font-weight: 600, padding: 11px 24px, border-radius: 8px, hover: opacity: 0.88 + translateY(-1px).
+Secondary: "Download Resume ↓" — ghost, same height, border: 1px solid var(--border-hover), hover: border-color: rgba(255,255,255,0.2).
+
+Right column — hero image:
+
+Outer container: position: relative, display: flex, justify-content: center.
+Image card: width: 360px, height: 480px, border-radius: 20px, overflow: hidden, border: 1px solid var(--border-hover), box-shadow: 0 40px 80px rgba(0,0,0,0.6).
+img inside: width: 100%, height: 100%, object-fit: cover, object-position: center top.
+Badge 1 (bottom-left of card, absolute): dark glass pill — "🏆 Spot Award ×3" / "Deloitte USI · 2025". backdrop-filter: blur(16px), background: rgba(9,9,11,0.8), border: 1px solid var(--border-hover), border-radius: 10px, padding: 10px 14px.
+Badge 2 (top-right of card, absolute): "GCP Certified ✓" — color: var(--accent), same glass styling.
+Ambient glow behind card: position: absolute, inset: -40px, background: radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 70%), z-index: -1, pointer-events: none.
+
+Hero background:
+
+Cursor spotlight: JS — on mousemove over hero, update a CSS variable --mx, --my to mouse position. Apply background: radial-gradient(600px circle at var(--mx) var(--my), rgba(59,130,246,0.04), transparent 70%) on hero section. Smooth, subtle, expensive-feeling.
+Very slow background pulse: @keyframes bgPulse shifts the background gradient between two near-identical deep dark values over 12 seconds. Imperceptible but alive.
+TRUST BAR
+
+padding: 28px 0. border-top: 1px solid var(--border). border-bottom: 1px solid var(--border).
+
+Single line centered: "Certified by · Recognised by" small muted label, then inline logos as styled text:
+  Google Cloud  ·  Databricks  ·  Snowflake  ·  Deloitte  ·  IIT Roorkee  ·  NIT Durgapur
+
+JetBrains Mono, 12px, color: var(--text3). · separators in var(--border-hover). On hover each item goes var(--text2).
+
+ABOUT — BENTO GRID
+
+Section annotation: [ 01 — ABOUT ] in JetBrains Mono 10px muted.
+Section title: Instrument Serif, 40px.
+Body paragraph: The full "About Me" text (engineer voice, 4 paragraphs from the prompt document above — the version starting "I'm a Cloud Data Engineer with over two years of experience...").
+
+Below the text: Asymmetric bento grid — CSS Grid, grid-template-columns: repeat(4, 1fr), grid-template-rows: auto auto, gap: 12px:
+
+Cell A (col 1–2, row 1): Specializations — border: 1px solid var(--border), border-radius: 12px, padding: 24px, 6 tags: Cloud Data Engineering · Distributed Processing · ETL/ELT · Lakehouse · GenAI Apps · RAG Systems
+Cell B (col 3, row 1): Current Role — Deloitte logo text + "Cloud Data Engineer" + "Apr 2024 – Present" + accent blue top border
+Cell C (col 4, row 1): Education — NIT Durgapur + B.Tech CS + CGPA 8.5 + "2020–2024"
+Cell D (col 1, row 2): Location — "📍 Hyderabad, India" + "Open to remote / relocation"
+Cell E (col 2–3, row 2): Mission statement — Instrument Serif italic: "Building data platforms that are reliable, scalable, and easy to operate."
+Cell F (col 4, row 2): Quick stat — "700+" interns / Gold Certificate — large number in accent, label below in mono
+
+All cells: background: var(--surface), border: 1px solid var(--border), border-radius: 12px. Hover: border-color: var(--border-hover), translateY(-2px) — smooth transition: 0.2s ease.
+
+EXPERIENCE
+
+Section annotation: [ 02 — EXPERIENCE ]
+
+Deloitte card — special treatment:
+Full-width card. Background: my_image.png with dark overlay rgba(9,9,11,0.88) — the office photo is subtly visible. border-radius: 16px, overflow: hidden, border: 1px solid var(--border). padding: 48px.
+Inside: Company + role + period header. Then bullet points using exact resume bullets above. Awards shown as 3 small badge chips at bottom: "🏆 Spot Award", "⭐ Best Performer", "🤝 AIG Client Award".
+
+Celebal card — standard:
+background: var(--surface), border: 1px solid var(--border), border-radius: 16px, padding: 40px. Left border accent in var(--violet) — border-left: 2px solid var(--violet). Gold Certificate badge chip.
+
+IIT Roorkee card:
+Slightly smaller. Same surface card. Left border accent in muted. "AI Research Trainee" role.
+
+Timeline connector: Between cards, a vertical line 2px wide, background: linear-gradient(var(--accent), var(--border)), margin-left: 32px, height: 40px. Animates from scaleY(0) to scaleY(1) when scrolled into view.
+
+PROJECTS
+
+Section annotation: [ 03 — PROJECTS ]
+Title: "Selected Projects" — Instrument Serif 40px.
+Subtitle: "A selection of projects spanning cloud data engineering, GenAI, distributed systems, and applied machine learning. Each solves a practical engineering challenge using production-ready technologies."
+
+Layout: One featured card full-width, then two half-width cards below in a row.
+
+Featured card — RAG Platform:
+border: 1px solid var(--border). border-radius: 16px. padding: 0. overflow: hidden.
+Two columns: left padding: 40px — title, description, tech stack, "Pitched at IIT Roorkee" badge, GitHub link. Right — dark panel with code block:
+
+python
+# RAG Data Retrieval Platform
+class VectorPipeline:
+    def ingest(self, sources):
+        chunks = self.chunk(sources)
+        vectors = embed(chunks)
+        return self.astra_db.upsert(
+            vectors, namespace="prod"
+        )
+    # 100K+ records · Astra DB
+
+Syntax highlighted: keywords var(--violet), functions var(--accent), strings 
+#86EFAC, comments var(--text3). JetBrains Mono 13px. Background 
+#0A0A0D.
+
+Medical Chatbot card (half-width):
+Normal surface card. "Deloitte Hack-on Finalist" badge in accent chip. Top 10 / 200+ teams. Tech stack tags. 40% retrieval accuracy improvement callout.
+
+Quantum CNN card (half-width):
+Normal surface card. "56% → 98% accuracy" as the hero number in large accent text. Gold Certificate badge. IBM Cloud / Qiskit tags.
+
+SKILLS
+
+Section annotation: [ 04 — TECHNICAL STACK ]
+Title: "Technologies I've used to build production data platforms, cloud infrastructure, and AI applications."
+
+Not progress bars. Use a tag cloud organized into labeled rows:
+
+Core Languages    →  Python  SQL  Java  Shell  C++  JavaScript
+Data Engineering  →  PySpark  Apache Spark  ETL/ELT  Delta Lake  IBM DataStage  Airflow  Data Modeling
+Cloud & Infra     →  AWS Glue  S3  Lambda  Redshift  GCP BigQuery  Snowflake  Databricks  Docker  Kubernetes
+AI & ML           →  LangChain  RAG  Pinecone  Astra DB  Quantum ML  Qiskit  Vector Search  Pandas
+Frameworks        →  FastAPI  Flask  Django  React JS  PostgreSQL  MongoDB  Git  JIRA  Agile
+
+Each row: label left in JetBrains Mono 10px muted uppercase, then tags flowing right. Tags: font-family: mono, font-size: 12px, padding: 4px 10px, border: 1px solid var(--border), border-radius: 6px, color: var(--text2), background: rgba(255,255,255,0.02). On hover: border-color: var(--border-hover), color: var(--text).
+
+Rows separated by thin 1px border lines.
+
+CERTIFICATIONS
+
+Section annotation: [ 05 — CERTIFICATIONS ]
+3-column grid. All 8 certs. Exact image filenames as given. Uniform card design as specified in image section above.
+
+AWARDS & ACHIEVEMENTS
+
+Section annotation: [ 06 — RECOGNITION ]
+Two-column layout: left = award photo + stacked achievement cards. Right = broader achievements list.
+
+Left:
+
+my_image_2.png — aspect-ratio: 3/4, max-width: 320px, border-radius: 16px, object-fit: cover, object-position: top. Overlay gradient at bottom → "Deloitte Excellence Award · Innovation in Technology · 2025".
+Below photo: 3 award chips: "🏆 Spot Award ×3" · "⭐ Best Performer Q" · "🤝 AIG Client Award"
+
+Right — Achievement list cards:
+Each achievement is a <div> with: left accent line in var(--accent) or var(--violet), metric in large mono text, description in Inter 13px. Use exact numbers from the achievements list above.
+
+Highlight these with large numbers:
+
+AIR 3,626 — IIT JEE Mains (Top 0.3%)
+700+ — interns beaten, Gold Certificate
+30,000+ — Publicis Sapient participants
+3,000+ — IONathon teams
+400+ — competitive programming problems
+CONTACT
+
+Section annotation: [ 07 — CONTACT ]
+Centered. max-width: 600px. margin: 0 auto. text-align: center.
+
+Title: Instrument Serif 48px — "Let's Build Something Exceptional"
+Subtitle: the accurate contact paragraph — "I'm always interested in discussing cloud data engineering, distributed systems, AI, and challenging engineering problems. Whether you're hiring, collaborating on a project, or simply want to connect, I'd be happy to hear from you. Based in Hyderabad, India. Open to remote, hybrid, and relocation opportunities."
+
+4 link buttons in a row, centered:
+
+Email: envelope SVG + "pawanpratapnitdgp24@gmail.com" — ghost button
+LinkedIn: LinkedIn SVG + "Connect" — ghost button
+GitHub: GitHub SVG + "View Code" — ghost button
+Resume: download SVG + "Download Resume" — filled accent blue, primary action
+
+All buttons: padding: 12px 22px, border-radius: 9px, font-size: 13px. Ghost: border: 1px solid var(--border-hover). Hover all: translateY(-2px) + transition: 0.2s.
+
+FOOTER
+
+Single line. padding: 24px 0. border-top: 1px solid var(--border).
+Left: "© 2026 Pawan Pratap Singh Chauhan" in JetBrains Mono 11px muted.
+Right: "Hyderabad, India · Cloud Data Engineer · Deloitte USI" in same.
+
+ANIMATIONS — EXACT SPEC
+Page load stagger:
+  nav        → opacity 0→1, duration 300ms, delay 0ms
+  hero pill  → opacity 0→1, translateY 8px→0, 400ms, delay 100ms
+  hero h1    → opacity 0→1, translateY 16px→0, 500ms, delay 200ms
+  hero body  → opacity 0→1, translateY 12px→0, 400ms, delay 350ms
+  hero image → opacity 0→1, translateX 20px→0, 500ms, delay 300ms
+  hero CTAs  → opacity 0→1, translateY 8px→0, 400ms, delay 450ms
+
+Scroll reveal (IntersectionObserver, threshold: 0.12):
+  All section titles, cards, and timeline items → opacity 0→1, translateY 20px→0, 500ms ease-out
+
+Counter animation:
+  When metrics section enters viewport, numbers count up from 0.
+  AIR 3,626: counts up over 1.2s
+  Use requestAnimationFrame, easeOutCubic easing.
+
+Kinetic word cycle (CSS only):
+  @keyframes wordCycle with opacity and clip-path. 5 words × 2.5s each = 12.5s total loop.
+
+Card hover:
+  transform: translateY(-3px)
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease
+  box-shadow on hover: 0 12px 40px rgba(0,0,0,0.4)
+  NEVER scale cards — only lift
+
+Reduced motion:
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+CODE REQUIREMENTS
+Single index.html file. All CSS in <style>. All JS in <script defer>.
+All image src use bare filenames: src="my_image_2.png". User places images in same folder.
+Every <img> has loading="lazy", alt text, and onerror="this.style.background='#1a2035';this.style.display='block'".
+max-width: 1200px content container, centered.
+Responsive breakpoints: 1024px (tablet) and 640px (mobile).
+Mobile: single column everywhere, hero image hidden on <480px or shown as half-height above text, nav shows only logo + resume button.
+Semantic HTML: <nav>, <main>, <section id="">, <article>, <footer>. Proper heading hierarchy: one <h1>, then <h2> per section, <h3> for cards.
+SEO: <meta name="description">, <meta property="og:title">, <meta property="og:description">, canonical.
+Vanilla JS only. No jQuery. No libraries. Under 120 lines of JS total.
+CSS custom properties for every color, font, and radius. Zero hardcoded hex values in selectors.
+The file must work by opening index.html directly — no server needed.
+DO NOT TRUNCATE THE OUTPUT. Deliver the entire file. If you approach a length limit, continue in a follow-up message and say "CONTINUED →".
+CONTENT RULES — NON-NEGOTIABLE
+Every number, metric, and claim must come from the resume above — zero fabrication
+Do NOT use: "Senior Engineer", "world-class", "revolutionary", "cutting-edge", "passionate", "leverage", "synergy"
+Do NOT call him "Senior" — he has 2 years experience
+Sound like an engineer wrote it, not a marketer
+The tone is: precise, direct, confident, understated
+
+Now build the complete file. Do not ask questions. Do not explain your plan. Do not truncate. Output the full, complete, production-ready index.html from the first character to the last.
