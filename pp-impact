@@ -1,0 +1,83 @@
+Snapshot 1- Completed SRM and Summary Table testing/validation for Premium and Loss across five products; presented findings to the client and uploaded evidence to Rally. Performed renewal_summary validation for Yacht and PEL, prepared and documented test results, analyzed stored procedures to identify defects, and supported the development team with issue triage and fixes.
+Snapshot 2- Led the end-to-end analysis, Design and development for the Marbleshore project. Analyzed SRM, NASH, and the Stone_river_package, and investigated 15 DataStage jobs to assess tuw_company dependencies. Created the design document, managed DWH loads, and executed database changes. Identified and flagged a critical Column size issue for resolution. Successfully delivered the solution and presented the design to AIG clients, ensuring seamless data integration.
+ Snapshot 3- Completed development changes for Marbleshore SRM package and presented the Design Review Document. Owned SRM and Summary Table testing end to end, including Rally test case uploads. Performed detailed analysis of stored procedures and downstream packages, coordinated with AIG to resolve issues, completed testing for 6 Cognos reports, and supported peers through KT, analysis, and issue resolution for 3 additional report tests and PCS Summary Table testing.
+Then once the marbleshore end to end development and testing was done by me,provided end to end support for depoloyment and hypercare  after the deployement was done.
+I started with another product that is GRX and MAU (group excess and mass auto).
+ Snapshot 4-
+Completed GRX and MAU analysis for AIG integration and delivered required development updates for SRM and Stoneriver, including DataStage job-level changes. Validated GRX policy loads in SRM following enhancements, provided hypercare support for Marbleshore production integration, and supported AIG bordereaux for GRX/MAU by partnering with developers to identify, document,preparation of testcase Document and evidence defects for resolution.
+
+
+
+
+
+
+I delivered end-to-end Development, data validation, testing, and production support across AIG and Private Client Select initiatives, operating effectively across both Developer and QA responsibilities.
+ I completed SRM and Summary Table validation for Premium and Loss data across five products, including renewal summary validation for Yacht and PEL. I also tested six Cognos reports, analyzed stored procedures and downstream packages to identify defects, documented test cases and evidence in Rally, and presented findings directly to AIG stakeholders. This work helped ensure that business reporting, premium, loss, and policy data were accurate, traceable, and ready for release.
+ Led DWH/E2E testing executing 100+ tables & functional validations, designing 80+ test cases with 800+ test steps for both Phase 1 & Phase 2, performing both batch full refresh, full loads, incremental & salesforce data loads in SIT, UAT & Pre-Prod.
+Managed defect lifecycle, raised/validated 80+ defects in Rally. Led KT for new hires at PCG.
+For the Marbleshore initiative, I led the analysis, design, development, testing, deployment, and post-production hypercare activities. Led the end-to-end analysis, design, and development activities for the Marbleshore initiative. Assessed impacts across SRM, NASH, StoneRiver packages, and 15 DataStage jobs to identify tuw_company dependencies and define required changes. Created the design documentation, managed DWH load activities, executed database changes, and presented the solution design to AIG stakeholders.
+
+I proactively identified and escalated a critical column-size issue before deployment, reducing the risk of incomplete or truncated data entering the target environment. I owned Marbleshore SRM package development and the end-to-end SRM and Summary Table testing effort, coordinated issue resolution with AIG and development teams, and supported a seamless production deployment and stabilization period.
+I expanded my contribution to the GRX and MAU integration by completing analysis and delivering required SRM, StoneRiver, and DataStage job-level development changes. I validated GRX policy loads in SRM following enhancements, prepared test-case documentation and supporting evidence, partnered with developers to document and resolve defects, and supported AIG bordereaux activities. Beyond my assigned deliverables, I enabled team execution through knowledge transfer, analysis support, and issue resolution for three additional report-testing efforts and PCS Summary Table testing.  
+
+I am a QA Tester & Developer in this project. I led E2E & QA testing from PCS (Source) & PCG (Target) across multiple insurance products, focusing on data validation, test management & process improvements. My responsibilities & achievements include:
+Data Warehouse(DWH) & Table Validation: I owned validation of 187+ DWH tables across 2 phases—Yacht & Collection & 5 LOBs—delivering a defect-free environment. Also validated 24 DWH & 18 landing-to-staging tables in PCS, identified 2 defects.
+ Downstream Systems: Developed & executed test suites for SRM – 40+ Testcases and Summary Table 17 testcases ,ensuring downstream data flow.
+
+• Defect Closure: Identified 33+ defects & followed-up with dev team for fixing.
+Supported production deployment and provided hypercare support, including testing the T-Renewal Summary tables for 5 LOBs. Identified and documented 3 defects during testing.
+
+Phase 3 Activities:
+I worked as developer for phase 3. Below are the tasks I performed.
+• Supported QA environmental readiness for Phase 3, including DataStage and database setup., Did development for SRM & Stone river package both datastage job lebel and package level procedure changes for GRX.
+Did analysis for MAU for the impact.
+ Created an end-to-end pipeline setup in the various projects.
+Worked with PCS dev team and completed the testing AIG bordereau for both GRX & MAU.
+
+
+this above is mine that I worked, you have to  update and imporve the way I wrote, 
+below is something some one else impact statement .
+you can just take a look how others wrote it.
+make my imporved and best way . don’t add anything from your side. And don’t mix my work with some other persons work
+Project Details Table
+S.No.	Project	Key Responsibilities	Feedback Provider(s)	Project Duration
+1.	AIG INSTANDA INTEGRATION – (January 2025 to December 2025)	I am a QA Tester in this project. I led E2E & QA testing from PCS (Source) & PCG (Target) across multiple insurance products, focusing on data validation, test management & process improvements. My responsibilities & achievements include:
+
+• Data Warehouse(DWH) & Table Validation: I owned validation of 187+ DWH tables across 2 phases—Yacht & Collection & 5 LOBs—delivering a defect-free environment. Also validated 24 DWH & 18 landing-to-staging tables in PCS, identified 2 defects.
+
+• Downstream Systems: Developed & executed test suites for NASH- 43 Testcases and Safelite 17 testcases ,ensuring downstream data flow.
+
+• Defect Closure: Identified 33+ defects & followed-up with dev team for fixing.	soors@deloitte.com,
+yakshaik@deloitte.com
+1958 – Jan 12th to dec 24th
+2.	AIG INSTANDA INTEGRATION – (January 2026 to December 2026)	I worked as QA Tester . Below are the responsibilities I took
+
+• Prepared audit and ACAND documentation for Phase 2 monthly sync up activities across five lines of business (LOBs).
+• Supported production deployment and provided hypercare support, including testing the T-Renewal Summary tables for 5 LOBs. Identified and documented 3 defects during testing.
+• Created test cases for the Verisk Premium and Collection feeds.
+
+Worked for the new MarbleShore integration by:
+1. Inserting MarbleShore entries into the DWH tables.
+2. Validating the flow of MarbleShore policies from ODS to DWH.
+3. Testing summary tables and key reports, including POLICY_SUMMARY_BROKER for current-year and loss reporting at PCS end.
+4. Performing additional policy-level validation checks.
+5. Supporting the transmission of MarbleShore policies to the AIG Bordereau twice
+6. Supported Prod Deployment during hypercare period.
+
+Phase 3 Activities:
+I worked as developer for phase 3. Below are the tasks I performed.
+• Supported QA environmental readiness for Phase 3, including DataStage and database setup.
+• Implemented development changes for the new Phase 3 products- GRX and MAU, across environments.
+• Identified Safelite as an in-scope process for Phase 3 changes.
+• Created an end-to-end pipeline setup in the various projects.
+• Managed daily Instanda and GRX loads.
+• Supported the exclusion of data from AIG to PCS.
+• Performed QA testing for TAccount and TCustomer to identify incorrect (text ends/cuts off at edge of screen)	soors@deloitte.com,
+yaksh
+
+Rosaly served as a lead ETL/DWH tester, driving validations, test design, defect management, load operations. Led DWH/E2E testing executing 100+ tables & functional validations, designing 80+ test cases with 800+ test steps for both Phase 1 & Phase 2, performing both batch full refresh, full loads, incremental & salesforce data loads in SIT, UAT & Pre-Prod. Managed defect lifecycle, raised/validated 80+ defects in JIRA. Led KT for new hires & PCS BAU/operate teams. Authored 50+ SQL queries via mapping docs/DS Jobs. Collaborated with dev/business teams on requirements & test case creation. Earned Databricks Associate Data Analyst, Google Cloud Associate Data Practitioner certification. Completed Insurance/Financial IPP courses. Recognized for excellence with 2 Applause Awards. Demonstrated strong understanding of primary area of technology/work (DataStage/SQL/JIRA) & able to execute assigned tasks independently. Gained functional expertise in the critical subject areas of the project.
+
+
+
+
+
