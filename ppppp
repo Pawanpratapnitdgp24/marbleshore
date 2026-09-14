@@ -1,0 +1,41 @@
+AIG Instanda Integration — Impact Summary
+
+Role: QA Tester & Developer — SRM, Summary Table, and Downstream Data Validation
+
+I delivered end-to-end development, data validation, testing, and production support across the AIG Instanda Integration and Private Client Select initiatives, operating across both Developer and QA responsibilities.
+
+SRM & Summary Table Testing (Premium & Loss)
+Completed SRM and Summary Table testing and validation for Premium and Loss data across five products, and performed renewal summary validation for Yacht and PEL.
+Tested six Cognos reports and analyzed stored procedures and downstream packages to identify defects.
+Documented test cases and evidence in Rally and presented findings directly to AIG stakeholders, ensuring business reporting, premium, loss, and policy data were accurate, traceable, and release-ready.
+Supported the development team with issue triage and fixes.
+Enabled team execution beyond my own deliverables — led knowledge transfer and supported analysis and issue resolution for 3 additional report-testing efforts, plus PCS Summary Table testing.
+DWH & Table Validation
+Led E2E and QA testing from PCS (source) to PCG (target) across multiple insurance products, focusing on data validation, test management, and process improvement.
+Owned validation of 187+ DWH tables across two phases — Yacht & Collection and 5 LOBs — delivering a defect-free environment.
+Validated 24 DWH and 18 landing-to-staging tables in PCS, identifying 2 defects.
+Developed and executed test suites covering 40+ SRM test cases and 17 Summary Table test cases to ensure downstream data flow.
+Identified 33+ defects and drove resolution with the development team.
+Led DWH/E2E testing across 100+ tables, designing 80+ test cases with 800+ test steps for Phase 1 and Phase 2, and executed batch full-refresh, full-load, incremental, and Salesforce data loads across SIT, UAT, and Pre-Prod.
+Managed the full defect lifecycle, raising and validating 80+ defects in Rally.
+Supported production deployment and hypercare, including testing T-Renewal Summary tables for 5 LOBs, and identified/documented 3 defects during testing.
+Led knowledge transfer for new hires on the PCG team.
+Marbleshore Initiative — End-to-End Ownership
+Led the end-to-end analysis, design, and development for the Marbleshore project: analyzed SRM, NASH, and the Stone River package, and investigated 15 DataStage jobs to assess tuw_company dependencies.
+Authored the design document and Design Review Document, managed DWH load activities, and executed the required database changes.
+Proactively identified and escalated a critical column-size issue ahead of deployment, reducing the risk of incomplete or truncated data reaching the target environment.
+Presented the solution design to AIG stakeholders and delivered the solution end to end, ensuring seamless data integration.
+Owned Marbleshore SRM package development and the SRM/Summary Table testing effort end to end, including all Rally test case uploads.
+Performed detailed analysis of stored procedures and downstream packages and coordinated directly with AIG to resolve issues.
+Provided end-to-end support through deployment and post-production hypercare, ensuring a seamless production rollout and stabilization period.
+GRX & MAU Integration (Group Excess & Mass Auto)
+Completed GRX and MAU analysis for AIG integration and delivered the required SRM and StoneRiver development updates, including DataStage job-level changes.
+Validated GRX policy loads in SRM following enhancements.
+Provided hypercare support for the Marbleshore production integration.
+Supported AIG bordereaux for GRX/MAU — partnered with developers to identify, document, and prepare test-case documentation and evidence for defect resolution.
+Phase 3 — Development Activities
+Supported QA environmental readiness for Phase 3, including DataStage and database setup.
+Delivered SRM and Stone River package development for GRX at both the DataStage job level and the package-level stored procedure level.
+Performed impact analysis for MAU.
+Built an end-to-end pipeline setup across multiple projects.
+Partnered with the PCS development team to complete AIG bordereau testing for both GRX and MAU.
