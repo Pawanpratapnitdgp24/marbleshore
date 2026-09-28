@@ -1,4 +1,11 @@
+this is the complete stone river package, go each and every line of code and understand .
+and tell me , how tmisc_coverage table is used? is there any dependency on that? and are we using tmisc_coverage in Manual process ? and any dependency on coverage_limit_am column on them? do reaseach and tell me?
+
+
+
 👉 Flow:
+
+
 
 Data comes from Duck Creek (WINS/CIP) into Tactical GDW as daily transactions
 Data is converted into inbound files and sent to the SRM Application
