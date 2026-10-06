@@ -1,0 +1,25 @@
+SELECT
+    l.claim_sk,
+    d.claim_no,
+    l.source_system_sk AS transaction_source_system_sk,
+    a.source_system_sk AS policy_source_system_sk,
+    a.source_system_nm,
+    a.policy_type_cd,
+    l.transaction_dt_sk,
+    td.month_acctng_ct,
+    l.loss_paid_am,
+    l.expense_paid_am,
+    l.loss_reserve_am,
+    l.expense_reserve_am,
+    l.other_recovery_am,
+    l.salvage_recovery_am,
+    l.subro_recovery_am
+FROM tclaim_transaction l
+JOIN tclaim d
+    ON d.claim_sk = l.claim_sk
+JOIN tpolicy a
+    ON a.policy_sk = d.policy_sk
+LEFT JOIN tdate td
+    ON td.date_sk = l.transaction_dt_sk
+WHERE TRIM(a.policy_type_cd) = 'GRX'
+  AND d.claim_no = :claim_no;
