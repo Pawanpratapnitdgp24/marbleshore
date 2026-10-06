@@ -40,3 +40,411 @@ LEFT JOIN tdate td
     ON td.date_sk = l.transaction_dt_sk
 WHERE TRIM(a.policy_type_cd) = 'GRX'
   AND d.claim_no = :claim_no;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT
+    x.claim_sk,
+    x.claim_no,
+    x.policy_sk,
+    x.policy_no,
+
+    /* ============================================================
+       BASIC DATA
+       ============================================================ */
+    x.policy_type_cd,
+    x.source_system_nm,
+    x.transaction_source_system_sk,
+    x.policy_source_system_sk,
+
+    x.claim_feature_sk,
+    x.feature_match,
+    x.customer_id,
+    x.customer_match,
+
+    x.transaction_dt_sk,
+    x.month_acctng_ct,
+
+    /* ============================================================
+       FINANCIAL VALUES
+       ============================================================ */
+    x.loss_paid_am,
+    x.expense_paid_am,
+    x.loss_reserve_am,
+    x.expense_reserve_am,
+    x.other_recovery_am,
+    x.salvage_recovery_am,
+    x.subro_recovery_am,
+
+    /* ============================================================
+       DIMENSION VALUES USED BY PROCEDURE
+       ============================================================ */
+    x.policy_type_match,
+    x.pol_type_wins_cd,
+
+    x.uw_co_cd,
+    x.uw_co_match,
+    x.wins_uw_cd,
+    x.company_num,
+
+    /* ============================================================
+       GRX / PAWAN SOURCE CONDITION
+       This is the condition you added.
+       ============================================================ */
+    CASE
+        WHEN
+            x.transaction_source_system_sk IN (23,24)
+            AND TRIM(x.source_system_nm) IN ('SF Admitted','SF Non-Admitted')
+            AND TRIM(x.policy_type_cd) = 'GRX'
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS PAWAN_GRX_GATE,
+
+    /* ============================================================
+       ORIGINAL + PAWAN COMBINED SOURCE GATE
+       This is EXACTLY the condition in the procedure.
+       ============================================================ */
+    CASE
+        WHEN
+               x.transaction_source_system_sk IN (6,7,15)
+            OR (
+                   x.transaction_source_system_sk IN (23,24)
+                   AND TRIM(x.source_system_nm)
+                       IN ('SF Admitted','SF Non-Admitted')
+                   AND TRIM(x.policy_type_cd) = 'GRX'
+               )
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS SOURCE_GATE,
+
+    /* ============================================================
+       POLICY TYPE GATE
+       Procedure:
+           TRIM(g.policy_type_cd) <> 'HP'
+       ============================================================ */
+    CASE
+        WHEN TRIM(x.policy_type_match) <> 'HP'
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS POLICY_TYPE_GATE,
+
+    /* ============================================================
+       UW COMPANY GATE
+       Procedure:
+           TRIM(SUBSTR(b.wins_uw_cd,3,2)) NOT IN ('51','61')
+       ============================================================ */
+    CASE
+        WHEN TRIM(SUBSTR(x.wins_uw_cd,3,2)) NOT IN ('51','61')
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS UW_COMPANY_GATE,
+
+    /* ============================================================
+       CLAIM FEATURE INNER JOIN
+       ============================================================ */
+    CASE
+        WHEN x.feature_match IS NOT NULL
+        THEN 'PASS'
+        ELSE 'FAIL - INNER JOIN WILL REMOVE ROW'
+    END AS CLAIM_FEATURE_GATE,
+
+    /* ============================================================
+       CUSTOMER INNER JOIN
+       ============================================================ */
+    CASE
+        WHEN x.customer_match IS NOT NULL
+        THEN 'PASS'
+        ELSE 'FAIL - INNER JOIN WILL REMOVE ROW'
+    END AS CUSTOMER_GATE,
+
+    /* ============================================================
+       BRANCH 1
+       OTHER RECOVERY
+
+       Procedure requires:
+           other_recovery_am <> 0
+           transaction month = in_ym
+       ============================================================ */
+    CASE
+        WHEN NVL(x.other_recovery_am,0) <> 0
+         AND x.month_acctng_ct = :in_ym
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS OTHER_RECOVERY_BRANCH,
+
+    /* ============================================================
+       BRANCH 2
+       RESERVE
+
+       Procedure requires:
+           loss_reserve_am <> 0
+           OR expense_reserve_am <> 0
+
+           month_acctng_ct <= in_ym
+       ============================================================ */
+    CASE
+        WHEN
+            (
+                NVL(x.loss_reserve_am,0) <> 0
+                OR NVL(x.expense_reserve_am,0) <> 0
+            )
+            AND x.month_acctng_ct <= :in_ym
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS RESERVE_BRANCH,
+
+    /* ============================================================
+       BRANCH 3
+       LOSS PAID
+
+       Procedure requires:
+           loss_paid_am <> 0
+           month_acctng_ct = in_ym
+       ============================================================ */
+    CASE
+        WHEN
+            NVL(x.loss_paid_am,0) <> 0
+            AND x.month_acctng_ct = :in_ym
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS LOSS_PAID_BRANCH,
+
+    /* ============================================================
+       BRANCH 4
+       EXPENSE PAID
+
+       Procedure requires:
+           expense_paid_am <> 0
+           month_acctng_ct = in_ym
+       ============================================================ */
+    CASE
+        WHEN
+            NVL(x.expense_paid_am,0) <> 0
+            AND x.month_acctng_ct = :in_ym
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS EXPENSE_PAID_BRANCH,
+
+    /* ============================================================
+       BRANCH 5
+       SALVAGE / SUBRO
+
+       Procedure requires:
+           salvage_recovery_am <> 0
+           OR subro_recovery_am <> 0
+
+           month_acctng_ct = in_ym
+       ============================================================ */
+    CASE
+        WHEN
+            (
+                NVL(x.salvage_recovery_am,0) <> 0
+                OR NVL(x.subro_recovery_am,0) <> 0
+            )
+            AND x.month_acctng_ct = :in_ym
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS SALVAGE_SUBRO_BRANCH,
+
+    /* ============================================================
+       FINAL COMMON JOIN/FILTER GATE
+       ============================================================ */
+    CASE
+        WHEN
+               (
+                   x.transaction_source_system_sk IN (6,7,15)
+                   OR (
+                       x.transaction_source_system_sk IN (23,24)
+                       AND TRIM(x.source_system_nm)
+                           IN ('SF Admitted','SF Non-Admitted')
+                       AND TRIM(x.policy_type_cd) = 'GRX'
+                   )
+               )
+           AND TRIM(x.policy_type_match) <> 'HP'
+           AND TRIM(SUBSTR(x.wins_uw_cd,3,2)) NOT IN ('51','61')
+           AND x.feature_match IS NOT NULL
+           AND x.customer_match IS NOT NULL
+        THEN 'PASS'
+        ELSE 'FAIL'
+    END AS COMMON_GATE,
+
+    /* ============================================================
+       DOES AT LEAST ONE OF THE FIVE CLAIM BRANCHES QUALIFY?
+       ============================================================ */
+    CASE
+        WHEN
+               (
+                   NVL(x.other_recovery_am,0) <> 0
+                   AND x.month_acctng_ct = :in_ym
+               )
+            OR (
+                   (
+                       NVL(x.loss_reserve_am,0) <> 0
+                       OR NVL(x.expense_reserve_am,0) <> 0
+                   )
+                   AND x.month_acctng_ct <= :in_ym
+               )
+            OR (
+                   NVL(x.loss_paid_am,0) <> 0
+                   AND x.month_acctng_ct = :in_ym
+               )
+            OR (
+                   NVL(x.expense_paid_am,0) <> 0
+                   AND x.month_acctng_ct = :in_ym
+               )
+            OR (
+                   (
+                       NVL(x.salvage_recovery_am,0) <> 0
+                       OR NVL(x.subro_recovery_am,0) <> 0
+                   )
+                   AND x.month_acctng_ct = :in_ym
+               )
+        THEN 'PASS'
+        ELSE 'FAIL - NO CLAIM BRANCH QUALIFIES'
+    END AS ANY_CLAIM_BRANCH,
+
+    /* ============================================================
+       OVERALL RESULT
+       ============================================================ */
+    CASE
+        WHEN
+               (
+                   x.transaction_source_system_sk IN (6,7,15)
+                   OR (
+                       x.transaction_source_system_sk IN (23,24)
+                       AND TRIM(x.source_system_nm)
+                           IN ('SF Admitted','SF Non-Admitted')
+                       AND TRIM(x.policy_type_cd) = 'GRX'
+                   )
+               )
+           AND TRIM(x.policy_type_match) <> 'HP'
+           AND TRIM(SUBSTR(x.wins_uw_cd,3,2)) NOT IN ('51','61')
+           AND x.feature_match IS NOT NULL
+           AND x.customer_match IS NOT NULL
+           AND (
+                   (
+                       NVL(x.other_recovery_am,0) <> 0
+                       AND x.month_acctng_ct = :in_ym
+                   )
+                   OR
+                   (
+                       (
+                           NVL(x.loss_reserve_am,0) <> 0
+                           OR NVL(x.expense_reserve_am,0) <> 0
+                       )
+                       AND x.month_acctng_ct <= :in_ym
+                   )
+                   OR
+                   (
+                       NVL(x.loss_paid_am,0) <> 0
+                       AND x.month_acctng_ct = :in_ym
+                   )
+                   OR
+                   (
+                       NVL(x.expense_paid_am,0) <> 0
+                       AND x.month_acctng_ct = :in_ym
+                   )
+                   OR
+                   (
+                       (
+                           NVL(x.salvage_recovery_am,0) <> 0
+                           OR NVL(x.subro_recovery_am,0) <> 0
+                       )
+                       AND x.month_acctng_ct = :in_ym
+                   )
+               )
+        THEN 'SHOULD REACH MAIN_QRY'
+        ELSE 'WILL BE FILTERED OUT'
+    END AS FINAL_DIAGNOSIS
+
+FROM
+(
+    SELECT
+        l.claim_sk,
+        d.claim_no,
+        d.policy_sk,
+
+        a.policy_no,
+        a.policy_type_cd,
+        a.source_system_nm,
+        a.source_system_sk AS policy_source_system_sk,
+
+        l.source_system_sk AS transaction_source_system_sk,
+
+        l.claim_feature_sk,
+
+        e.claim_feature_sk AS feature_match,
+        tc.customer_id AS customer_match,
+        a.customer_id,
+
+        l.transaction_dt_sk,
+        td.month_acctng_ct,
+
+        l.loss_paid_am,
+        l.expense_paid_am,
+        l.loss_reserve_am,
+        l.expense_reserve_am,
+        l.other_recovery_am,
+        l.salvage_recovery_am,
+        l.subro_recovery_am,
+
+        g.policy_type_cd AS policy_type_match,
+        g.pol_type_wins_cd,
+
+        a.uw_co_cd,
+        b.uw_co_cd_1 AS uw_co_match,
+        b.wins_uw_cd,
+
+        TRIM(SUBSTR(b.wins_uw_cd,3,2)) AS company_num
+
+    FROM tclaim_transaction l
+
+    JOIN tclaim d
+        ON d.claim_sk = l.claim_sk
+
+    JOIN tpolicy a
+        ON a.policy_sk = d.policy_sk
+
+    /* LEFT JOIN ONLY FOR DIAGNOSTIC PURPOSES.
+       Production code uses INNER JOIN. */
+    LEFT JOIN tclaim_features e
+        ON e.claim_feature_sk = l.claim_feature_sk
+
+    /* LEFT JOIN ONLY FOR DIAGNOSTIC PURPOSES.
+       Production code uses INNER JOIN. */
+    LEFT JOIN tcustomer tc
+        ON tc.customer_id = a.customer_id
+
+    LEFT JOIN tpolicy_type g
+        ON TRIM(a.policy_type_cd) = TRIM(g.policy_type_cd)
+
+    LEFT JOIN tuw_company b
+        ON TRIM(a.uw_co_cd) = TRIM(b.uw_co_cd_1)
+
+    LEFT JOIN tdate td
+        ON td.date_sk = l.transaction_dt_sk
+
+    WHERE
+        l.claim_sk = :claim_sk
+
+        /* Your confirmed GRX population */
+        AND l.source_system_sk IN (23,24)
+        AND TRIM(a.source_system_nm)
+            IN ('SF Admitted','SF Non-Admitted')
+        AND TRIM(a.policy_type_cd) = 'GRX'
+)
+x
+ORDER BY
+    x.transaction_dt_sk;
