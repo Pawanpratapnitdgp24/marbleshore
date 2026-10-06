@@ -1,0 +1,109 @@
+Pawan's changes are in prc_claims_feed_load (lines 4065–7446), prc_claims_control_load (9756–12815), and one in the CIP claims feed. I'll read the manual claims feed procedure from the top.
+
+Ran a command
+
+Line 4065 falls inside prc_premium_feed_load (2204–4246), not claims. I'll look at each Pawan change in context, starting with the premium one for reference.
+
+Ran 8 commands · 2 notes
+
+The line-of-business DECODE has GEX → 171 (Group Excess), so the output side already knows that product. Now the portion after GROUP BY in each branch, for HAVING clauses or outer filters.
+
+Ran 11 commands · 1 note
+
+I can't run SQL against your database, so I can't name the one predicate that's dropping your GRX claims from the code alone. What I can do is rule out the code-level causes, rank the data-dependent ones, and give you a query that names the failing condition in one run.
+
+What Pawan changed
+
+All the -- Pawan changes are in grx_pkg_stone_CLAIMS_MANUAL.txt, in two groups:
+
+Location	Change
+prc_claims_feed_load, 5 branches (lines 4779, 5400, 6206, 6821, 7446)	l.source_system_sk IN (6,7,15) became ... OR (l.source_system_sk IN (23,24) AND TRIM(a.source_system_nm) IN ('SF Admitted','SF Non-Admitted') AND TRIM(a.policy_type_cd)='GRX')
+prc_claims_control_load, 5 branches (10424 to 12815)	The same edit
+prc_premium_feed_load (4065) and prc_premium_control_load (9756)	GRX added on the policy side: a.source_system_sk IN (23,24)
+Line 17702 (prc_cip_claims_feed_load)	Only a --pawan tag on an unchanged CIP line. No GRX change.
+
+The five claims branches are:
+
+Part 1: other_recovery_am (month = in_ym) and reserves (month <= in_ym).
+Part 2: loss_paid_am, expense_paid_am, and salvage_recovery_am / subro_recovery_am.
+What I ruled out
+Syntax and precedence: the new OR is correctly parenthesised, so non-GRX behaviour is unchanged.
+Missed branches: all 5 feed branches and all 5 control branches got the same edit.
+Allow-list: the manual claims proc has no policy_type_cd IN (...) list, so there is nothing to add for GRX.
+Wiped rows: the only DELETE on stage_loss_feed_details is line 4268, before Part 1. The CIP feed writes to stage_cip_loss_feed_details, a different table.
+Silent failure: the EXCEPTION block re-raises, so an error would not look like "no rows".
+Output mapping: the line-of-business DECODE already maps GEX to 171.
+
+So the filter is written correctly. The question is whether your GRX rows survive every other condition in the chain.
+
+Why GRX rows can still be dropped
+
+A claim row has to pass all of these before it reaches Pawan's WHERE. None of them were touched by the change.
+
+l.source_system_sk IN (23,24) on the claim transaction.
+Pawan took the policy-side SK values (23/24 for SF) and applied them to tclaim_transaction.source_system_sk.
+The CIP claims proc filters on the policy's SK instead.
+If your GRX claim transactions carry a different SK (e.g. 6/7 or something else), they fail.
+I rank this as the most likely cause, because it's the one value assumed rather than verified.
+JOIN tcustomer is an inner join in claims. Premium uses LEFT JOIN tcustomer. SF-sourced policies with a missing or non-matching customer_id load premium fine but lose all claims.
+JOIN tclaim_features is an inner join. CIP claims use LEFT JOIN. A claim_feature_sk that is 0 or NULL, or has no row, drops the transaction.
+LEFT JOIN tpolicy_type g combined with TRIM(g.policy_type_cd) <> 'HP'.
+If tpolicy_type has no GRX row, g is NULL, the comparison evaluates to UNKNOWN, and the row is removed.
+The LEFT JOIN acts like an inner join here.
+LEFT JOIN tuw_company b combined with NOT IN ('51','61'). The same NULL behaviour applies if the GRX uw_co_cd has no match. It also drops the row if the GRX company's wins_uw_cd happens to end in 51 or 61.
+Policy resolved through tclaim.policy_sk (d.policy_sk), not tclaim_transaction.policy_sk. CIP uses the transaction's own policy_sk. If tclaim.policy_sk is unset or points to a different policy row, a.source_system_nm fails.
+Date and amount columns:
+The date join uses tdate.month_acctng_ct. CIP uses pcs_month_acctng_ct. A transaction_dt_sk of 0 or -1 fails.
+The amounts use loss_paid_am and expense_paid_am. CIP uses *_original_am. If SF writes only the original columns, <> 0 filters everything out.
+One query to find the failing condition
+
+Replace :ym with the month (e.g. 202609) and :claim_no with a GRX claim you know is missing from the feed. It returns one row per transaction and the first check it fails.
+
+sql
+SELECT t3.claim_sk, t3.source_system_sk AS tran_src_sk,
+       t4.month_acctng_ct, t3.loss_paid_am, t3.loss_paid_original_am,
+       t3.expense_paid_am, t3.loss_reserve_am, t3.expense_reserve_am,
+       CASE
+         WHEN t4.date_sk IS NULL                         THEN '1 transaction_dt_sk not in tdate'
+         WHEN t4.month_acctng_ct IS NULL                 THEN '2 month_acctng_ct is NULL'
+         WHEN d.claim_sk IS NULL                         THEN '3 no tclaim row'
+         WHEN a.policy_sk IS NULL                        THEN '4 tclaim.policy_sk has no tpolicy row'
+         WHEN tc.customer_id IS NULL                     THEN '5 tcustomer inner join fails'
+         WHEN e.claim_feature_sk IS NULL                 THEN '6 tclaim_features inner join fails'
+         WHEN g.policy_type_cd IS NULL                   THEN '7 no tpolicy_type row (<> HP is UNKNOWN)'
+         WHEN b.uw_co_cd_1 IS NULL                       THEN '8 no tuw_company row (NOT IN is UNKNOWN)'
+         WHEN TRIM(SUBSTR(b.wins_uw_cd,3,2)) IN ('51','61') THEN '9 company 51/61 excluded'
+         WHEN t3.source_system_sk NOT IN (6,7,15,23,24)  THEN '10 tran source_system_sk not in list'
+         WHEN t3.source_system_sk IN (23,24)
+              AND TRIM(a.source_system_nm) NOT IN ('SF Admitted','SF Non-Admitted')
+                                                         THEN '11 policy source_system_nm mismatch'
+         WHEN t3.source_system_sk IN (23,24)
+              AND TRIM(a.policy_type_cd) <> 'GRX'        THEN '12 policy_type_cd not GRX'
+         WHEN t3.loss_paid_am = 0 AND t3.expense_paid_am = 0
+              AND t3.loss_reserve_am = 0 AND t3.expense_reserve_am = 0
+              AND t3.other_recovery_am = 0 AND t3.salvage_recovery_am = 0
+              AND t3.subro_recovery_am = 0               THEN '13 all amount columns are 0'
+         WHEN t4.month_acctng_ct > :ym                   THEN '14 future month'
+         ELSE 'PASSES all filters (check month = ym for paid/recovery branches)'
+       END AS first_failed_check
+FROM   tclaim_transaction t3
+LEFT JOIN tdate            t4 ON t3.transaction_dt_sk = t4.date_sk
+LEFT JOIN tclaim           d  ON d.claim_sk = t3.claim_sk
+LEFT JOIN tpolicy          a  ON a.policy_sk = d.policy_sk
+LEFT JOIN tcustomer        tc ON tc.customer_id = a.customer_id
+LEFT JOIN tclaim_features  e  ON t3.claim_feature_sk = e.claim_feature_sk
+LEFT JOIN tpolicy_type     g  ON TRIM(a.policy_type_cd) = TRIM(g.policy_type_cd)
+LEFT JOIN tuw_company      b  ON TRIM(a.uw_co_cd) = TRIM(b.uw_co_cd_1)
+WHERE  t3.claim_sk IN (SELECT claim_sk FROM tclaim WHERE claim_no = :claim_no);
+
+If this returns no rows, the claim isn't in tclaim at all, or claim_no has padding (try TRIM).
+
+Likely fixes once it names the cause
+Check 10: change l.source_system_sk IN (23,24) to a.source_system_sk IN (23,24) in all 10 places. This matches the premium and CIP logic and doesn't depend on how the claim ETL stamps SKs.
+Checks 5 and 6: change JOIN tcustomer and JOIN tclaim_features to LEFT JOIN in the 5 feed and 5 control branches.
+Checks 7 to 9: scope the exemption to GRX so other products keep their current behaviour, e.g. AND (TRIM(g.policy_type_cd) <> 'HP' OR TRIM(a.policy_type_cd) = 'GRX'). Fix the missing dimension rows at the source if you can.
+Check 13: the amounts live in other columns (e.g. *_original_am), so the l inline views need to read those.
+
+Apply only what the query proves, and mirror every fix in prc_claims_control_load, otherwise the control totals won't tie to the feed.
+
+Send me the output of that query, or the SK distribution for your GRX claims, and I'll tell you exactly which fix applies.
