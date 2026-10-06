@@ -5,7 +5,19 @@ SALVAGE_RECOVERY_AM,SUBRO_RECOVERY_AM,OTHER_RECOVERY_AM -- these 3 are the colum
 we need any particular recovery from these 3-- Salvage , Subro and other or any other columns is must so data is loaded into stone river table for Manual claims
 or 
 any wd be fine
+prc_load_policy_history_manual
 
+this is procedure is failing
+
+we are getting some issue like this which can not be the exact reason
+
+i want to know what all tables we are using to load the using this procedure,
+
+PRC_LOAD_POLICY_HISTORY_MANUAL..PRC_LOAD_POLICY_HISTORY_MANUAL: ORA-30926: unable to get a stable set of rows in the source tables ORA-06512: at "MISREG.PKG_STONE_RIVER_DATA_LOAD", line 1633 ORA-06512: at "MISREG.PKG_STONE_RIVER_DATA_LOAD", line 110 ORA-06512: at "MISREG.PKG_STONE_RIVER_DATA_LOAD", line 58 ORA-06512:
+
+it is showing as some unstable rows are comming,
+
+do advanced level research and tell me, what can be the issue, and tell me which all tables we are using or is there any other procedure its or function its using to load?
 create or replace PACKAGE BODY pkg_stone_river_data_load AS
   /************************************************************************************************************************
 
