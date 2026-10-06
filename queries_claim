@@ -1,5 +1,22 @@
 SELECT
     l.claim_sk,
+    l.source_system_sk,
+    a.policy_no,
+    a.source_system_nm,
+    a.policy_type_cd
+FROM tclaim_transaction l
+JOIN tclaim d
+    ON d.claim_sk = l.claim_sk
+JOIN tpolicy a
+    ON a.policy_sk = d.policy_sk
+WHERE l.source_system_sk IN (23,24)
+  AND TRIM(a.source_system_nm) IN ('SF Admitted','SF Non-Admitted')
+  AND TRIM(a.policy_type_cd) = 'GRX'
+  AND l.claim_sk = :claim_sk;
+
+---------------------------------
+SELECT
+    l.claim_sk,
     d.claim_no,
     l.source_system_sk AS transaction_source_system_sk,
     a.source_system_sk AS policy_source_system_sk,
