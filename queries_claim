@@ -542,3 +542,55 @@ CLAIM_SK	CLAIM_NO	POLICY_SK	POLICY_NO	POLICY_TYPE_CD	SOURCE_SYSTEM_NM	TRANSACTIO
 -650000042	4291225	-690119268	0006900112	GRX	SF Admitted	23	23	-650000032	-650000032	3000007473	3000007473	9770	202610	0	0	10000	0	0	0	0	GRX	GEX	CPCC	CPCC	0050      	50	PASS	PASS	PASS	PASS	PASS	PASS	FAIL	FAIL	FAIL	FAIL	FAIL	PASS	FAIL - NO CLAIM BRANCH QUALIFIES	WILL BE FILTERED OUT
 -650000044	4291229	-690115925	0006900119	GRX	SF Non-Admitted	24	24	-650000034	-650000034	3000007800	3000007800	9770	202610	0	0	2500	0	0	0	0	GRX	GEX	MSIC	MSIC	0040      	40	PASS	PASS	PASS	PASS	PASS	PASS	FAIL	FAIL	FAIL	FAIL	FAIL	PASS	FAIL - NO CLAIM BRANCH QUALIFIES	WILL BE FILTERED OUT
 -650000041	4291224	-690115925	0006900119	GRX	SF Non-Admitted	24	24	-650000031	-650000031	3000007800	3000007800	9770	202610	0	0	100	0	0	0	0	GRX	GEX	MSIC	MSIC	0040      	40	PASS	PASS	PASS	PASS	PASS	PASS	FAIL	FAIL	FAIL	FAIL	FAIL	PASS	FAIL - NO CLAIM BRANCH QUALIFIES	WILL BE FILTERED OUT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT
+    l.claim_sk,
+    l.claim_feature_sk,
+
+    l.other_recovery_am,
+    l.loss_reserve_am,
+    l.expense_reserve_am,
+    l.loss_paid_am,
+    l.expense_paid_am,
+    l.salvage_recovery_am,
+    l.subro_recovery_am,
+
+    CASE
+        WHEN NVL(l.other_recovery_am,0) <> 0
+          OR NVL(l.loss_reserve_am,0) <> 0
+          OR NVL(l.expense_reserve_am,0) <> 0
+          OR NVL(l.loss_paid_am,0) <> 0
+          OR NVL(l.expense_paid_am,0) <> 0
+          OR NVL(l.salvage_recovery_am,0) <> 0
+          OR NVL(l.subro_recovery_am,0) <> 0
+        THEN 'AMOUNT EXISTS'
+        ELSE 'NO AMOUNT'
+    END AS AMOUNT_RESULT
+
+FROM tclaim_transaction l
+WHERE l.claim_sk = :claim_sk;
