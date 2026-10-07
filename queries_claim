@@ -1,3 +1,116 @@
+select * FROM
+
+                                                 (
+
+                                                SELECT
+
+                                                    t3.*
+
+                                                FROM
+
+                                                    tclaim_transaction t3,
+
+                                                    tdate              t4
+
+                                                WHERE
+
+                                                    ( t3.other_recovery_am <> 0 ) or ( t3.loss_reserve_am <> 0
+
+                                                      OR t3.expense_reserve_am <> 0 )
+
+                                                    AND t3.transaction_dt_sk = t4.date_sk
+
+                                                    AND t4.month_acctng_ct = 202609 -- we are using month_acctng_ct for Manual process, so claims are not flowing for current month.
+
+                                            ) l
+
+                                            JOIN tclaim              d ON d.claim_sk = l.claim_sk
+
+                                            JOIN tpolicy             a ON a.policy_sk = d.policy_sk
+
+                                            JOIN tcustomer           tc ON tc.customer_id = a.customer_id
+
+                                            JOIN tclaim_features     e ON l.claim_feature_sk = e.claim_feature_sk
+
+                                            LEFT JOIN ttransaction_type   m ON l.tran_type_sk = m.tran_type_sk
+
+                                            LEFT JOIN tuw_company         b ON TRIM(a.uw_co_cd) = TRIM(b.uw_co_cd_1)
+
+                                            LEFT JOIN tlosstype           k ON d.loss_type_sk = k.loss_type_sk
+
+                                            LEFT JOIN tpolicy_type        g ON TRIM(a.policy_type_cd) = TRIM(g.policy_type_cd)
+
+                                            LEFT JOIN tpim_coverage       h ON l.coverage_sk = h.pim_coverage_sk
+
+                                            LEFT JOIN tcoverage           i ON l.coverage_sk = i.coverage_sk
+
+                                            LEFT JOIN trisk_state_country n ON a.risk_state_country_sk = n.risk_state_country_sk
+
+                                            LEFT JOIN tprocessing_office  po ON TRIM(a.uw_center_nm) = TRIM(po.processing_office_desc_tx
+
+                                            )
+
+                                        WHERE
+
+                                                TRIM(g.policy_type_cd) <> 'HP'
+
+                                            AND TRIM(substr(b.wins_uw_cd, 3, 2)) NOT IN ( '51', '61' )
+
+                                           AND (
+
+                                                    l.source_system_sk IN (6, 7, 15)
+
+                                                    OR (
+
+                                                    l.source_system_sk IN (23, 24)
+
+                                                    AND TRIM(a.source_system_nm) in ('SF Admitted','SF Non-Admitted')
+
+                                                    AND TRIM(a.policy_type_cd) = 'GRX'
+
+                                                         )
+
+                                                        );
+
+                                    but it if give condition
+AND ((t4.month_acctng_ct <= 202609 AND T3.SOURCE_SYSTEM_SK NOT IN (23,24))
+
+                                                    OR (t4.pcs_month_acctng_ct <= 202609 AND T3.SOURCE_SYSTEM_SK IN (23,24)))
+ 
+claims will flow for manual process for GRX for current month, as we are running stone river for 202609
+but  GRX claims will get loaded for 202610 
+ 
+  
+ 
+MONTH_ACCTNG_CT	PCS_MONTH_ACCTNG_CT	DATE_SK	YEAR_CT
+
+202610	202609	9770	2026
+ 
+this is  select month_acctng_ct,pcs_month_acctng_ct,date_sk,year_ct from tdate@mispp where actual_dt='30-SEP-26';  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 SELECT
     l.claim_sk,
     l.source_system_sk,
