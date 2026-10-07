@@ -1,3 +1,35 @@
+AND (
+       (
+           t4.month_acctng_ct <= in_ym
+           AND t3.source_system_sk NOT IN (23,24)
+       )
+       OR
+       (
+           t4.pcs_month_acctng_ct <= in_ym
+           AND t3.source_system_sk IN (23,24)
+       )
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 select * FROM
 
                                                  (
